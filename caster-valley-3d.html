@@ -206,34 +206,34 @@
         
         
         .achievement-notification {
-            position: fixed; left: -280px; top: 110px; width: 260px; background: linear-gradient(135deg, #ffd700, #f4a261);
-            border: 3px solid var(--brown-dark); border-radius: 10px; padding: 10px; z-index: 3000;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.6); animation: slide-in-left 0.5s ease forwards;
+            position: fixed; left: 50%; top: 20px; transform: translateX(-50%); width: 200px; background: linear-gradient(135deg, #ffd700, #f4a261);
+            border: 3px solid var(--brown-dark); border-radius: 10px; padding: 8px; z-index: 3000;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6); animation: slide-in-top 0.5s ease forwards;
         }
-        @keyframes slide-in-left {
-            from { left: -280px; }
-            to { left: 20px; }
+        @keyframes slide-in-top {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-        @keyframes slide-out-left {
-            from { left: 20px; }
-            to { left: -280px; }
+        @keyframes slide-out-top {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
-        .achievement-notification.hiding { animation: slide-out-left 0.5s ease forwards; }
-        .achievement-notification-header { font-family: 'Press Start 2P'; font-size: 8px; text-align: center; margin-bottom: 8px; color: var(--brown-dark); }
-        .achievement-notification-body { display: flex; align-items: center; gap: 10px; }
-        .achievement-notification-icon { font-size: 36px; }
+        .achievement-notification.hiding { animation: slide-out-top 0.5s ease forwards; }
+        .achievement-notification-header { font-family: 'Press Start 2P'; font-size: 7px; text-align: center; margin-bottom: 6px; color: var(--brown-dark); }
+        .achievement-notification-body { display: flex; align-items: center; gap: 6px; }
+        .achievement-notification-icon { font-size: 24px; }
         .achievement-notification-text { flex: 1; }
-        .achievement-notification-title { font-family: 'Press Start 2P'; font-size: 7px; margin-bottom: 4px; }
-        .achievement-notification-reward { font-size: 9px; font-weight: bold; color: var(--gold); }
+        .achievement-notification-title { font-family: 'Press Start 2P'; font-size: 6px; margin-bottom: 2px; }
+        .achievement-notification-reward { font-size: 7px; font-weight: bold; color: var(--gold); }
         
         .weather-notification {
-            position: fixed; left: 20px; top: 200px; width: 220px; background: linear-gradient(135deg, #87ceeb, #6ba3d0);
-            border: 3px solid var(--brown-dark); border-radius: 8px; padding: 8px; z-index: 2900;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fade-in 0.4s ease;
+            position: fixed; left: 50%; top: 20px; transform: translateX(-50%); width: 180px; background: linear-gradient(135deg, #87ceeb, #6ba3d0);
+            border: 3px solid var(--brown-dark); border-radius: 8px; padding: 6px; z-index: 2900;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: fade-in-center 0.4s ease;
         }
-        @keyframes fade-in { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        .weather-notification-title { font-family: 'Press Start 2P'; font-size: 7px; margin-bottom: 6px; text-align: center; }
-        .weather-notification-text { font-size: 9px; text-align: center; line-height: 1.4; }
+        @keyframes fade-in-center { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .weather-notification-title { font-family: 'Press Start 2P'; font-size: 6px; margin-bottom: 4px; text-align: center; }
+        .weather-notification-text { font-size: 8px; text-align: center; line-height: 1.3; }
         
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85);
@@ -315,13 +315,13 @@
         .achievement-card.done { background: linear-gradient(135deg, #ffd700, #f4a261); box-shadow: 0 0 20px rgba(255,215,0,0.6); }
         .achievement-card.locked { opacity: 0.5; }
         .toast {
-            font-family: 'Press Start 2P', cursive; position: fixed; bottom: 140px; left: 20px;
-            background: linear-gradient(135deg, var(--brown-light), var(--brown-med)); color: var(--cream); padding: 8px 14px; border-radius: 6px; font-size: 7px;
-            box-shadow: 0 4px 0 var(--brown-dark); animation: toast-slide-left 0.4s ease, toast-out-left 0.4s ease 2.6s forwards; z-index: 3000;
-            border: 2px solid var(--brown-dark); text-shadow: 1px 1px 0 var(--brown-dark); line-height: 1.4; max-width: 250px;
+            font-family: 'Press Start 2P', cursive; position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--brown-light), var(--brown-med)); color: var(--cream); padding: 6px 10px; border-radius: 6px; font-size: 6px;
+            box-shadow: 0 4px 0 var(--brown-dark); animation: toast-slide-down 0.4s ease, toast-slide-up 0.4s ease 2.6s forwards; z-index: 3000;
+            border: 2px solid var(--brown-dark); text-shadow: 1px 1px 0 var(--brown-dark); line-height: 1.3; max-width: 220px;
         }
-        @keyframes toast-slide-left { from { opacity: 0; transform: translateX(-100px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes toast-out-left { to { opacity: 0; transform: translateX(-100px); } }
+        @keyframes toast-slide-down { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes toast-slide-up { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
         
         /* Camera Recenter Button */
         .recenter-btn {
@@ -496,7 +496,17 @@
 
         // Save migration handlers - add here when format changes
         const SAVE_MIGRATIONS = {
-            // Example: 1: (save) => { save.newField = defaultValue; return save; }
+            1: (save) => {
+                // v1 -> v2: Ensure fishFedToDragon stat exists
+                if (!save.stats) save.stats = {};
+                if (save.stats.fishFedToDragon === undefined) save.stats.fishFedToDragon = 0;
+                return save;
+            },
+            2: (save) => {
+                // v2 -> v3: Ensure all new fields exist (no structural changes, just safety)
+                if (!save.stats) save.stats = {};
+                return save;
+            }
         };
 
         function migrateSave(save) {
@@ -610,7 +620,7 @@
             defaultCameraOffset: { x: 0, y: 28, z: 15 },
             isDraggingCamera: false,
             previousPointerPosition: { x: 0, y: 0 },
-            panSpeed: 0.035,
+            panSpeed: 0.02, // Slightly reduced for more controlled feel
             maxPanX: 25,
             maxPanZ: 25,
             isRecentering: false,
@@ -715,6 +725,11 @@
             },
 
             applySaveData(d) {
+                // Migrate the save first
+                if (d.version !== SAVE_VERSION) {
+                    d = migrateSave(d);
+                }
+                
                 this.essence = d.essence || 0; this.hp = d.hp || 100; this.maxHP = d.maxHP || 100;
                 this.level = d.level || 1; this.xp = d.xp || 0; this.xpNeeded = d.xpNeeded || 100;
                 this.plantSpeed = d.plantSpeed || 0; this.baseDamage = d.baseDamage || 0;
@@ -726,6 +741,11 @@
                 if (!this.seeds[1] || this.seeds[1] <= 0) this.seeds[1] = 5;
                 this.unlockedAreas = d.unlockedAreas || { farm: true, mine: false, forest: false, fishing: false, astral: false };
                 this.stats = d.stats || { totalHarvests: 0, totalRocksMined: 0, totalTrollsKilled: 0, fishCaught: 0, totalEssenceEarned: 0, deathCount: 0, playtime: 0, saturnsBurst: 0, fishFedToDragon: 0 };
+                // Ensure all stat fields exist
+                const requiredStats = { totalHarvests: 0, totalRocksMined: 0, totalTrollsKilled: 0, fishCaught: 0, totalEssenceEarned: 0, deathCount: 0, playtime: 0, saturnsBurst: 0, fishFedToDragon: 0 };
+                for (let key in requiredStats) {
+                    if (!(key in this.stats)) this.stats[key] = requiredStats[key];
+                }
                 this.completedAchievements = d.completedAchievements || [];
                 this.fishInventory = d.fishInventory || 0;
                 this.shownFirstFishNotif = d.shownFirstFishNotif || false;
@@ -4207,17 +4227,22 @@
                             const currentScale = plot.plantMesh.scale.x;
                             const newScale = currentScale + (targetScale - currentScale) * 0.1;
                             plot.plantMesh.scale.set(newScale, newScale, newScale);
-                            plot.plantMesh.position.y = 0.6 + newScale * 0.45; // Higher position for bigger plants
+                            const baseY = 0.6 + newScale * 0.45; // Base position for bigger plants
                             const tier = plot.plantMesh.userData?.tier || 1;
                             const phase = plot.plantMesh.userData?.swayPhase || 0;
                             plot.plantMesh.rotation.z = Math.sin(Date.now() / 500 + phase) * 0.08;
                             plot.plantMesh.rotation.x = Math.sin(Date.now() / 700 + phase) * 0.04;
                             if (tier === 3 || tier === 7) {
                                 plot.plantMesh.rotation.y += 0.01;
+                                plot.plantMesh.position.y = baseY;
                             } else if (tier === 4 || tier === 9) {
-                                plot.plantMesh.position.y += Math.sin(Date.now() / 600 + phase) * 0.05;
+                                // Sway up/down but always return to base position
+                                plot.plantMesh.position.y = baseY + Math.sin(Date.now() / 600 + phase) * 0.05;
                             } else if (tier === 6 || tier === 10) {
                                 plot.plantMesh.rotation.y += 0.02;
+                                plot.plantMesh.position.y = baseY;
+                            } else {
+                                plot.plantMesh.position.y = baseY;
                             }
                             if (progress >= 1) {
                                 plot.plantMesh.rotation.y += 0.05; // Faster rotation when ready!

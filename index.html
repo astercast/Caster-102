@@ -438,6 +438,11 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
+        .tab-emoji {
+            font-size: 0.7em;
+            opacity: 0.85;
+        }
+
         .tab:hover:not(.active) {
             background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.1));
             border: 1px solid rgba(251, 191, 36, 0.4);
@@ -1034,18 +1039,58 @@
         </div>
 
     <script>
-        // showTab function moved to main script block
+        // Global Treasury Cache Variables
+        let _treasuryCache = {
+            baseData: null,
+            chiaData: null,
+            nftData: null,
+            timestamp: null
+        };
+        
+        // Treasury Loading Modal
+        const TREASURY_MODAL_HTML = `
+            <div id="treasury-loading-modal" style="
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+                display: none; z-index: 9999;
+                align-items: center; justify-content: center;
+            ">
+                <div style="
+                    background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(10, 10, 20, 0.98));
+                    border: 2px solid rgba(251, 191, 36, 0.4);
+                    border-radius: 16px; padding: 40px 32px; max-width: 400px;
+                    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+                ">
+                    <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⛓️</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #fbbf24; margin-bottom: 12px;">Treasury Loading</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+                        Aggregating data from Base & Chia wallets...<br/>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.5);">This may take 30-60 seconds</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px;">
+                        <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
+                        <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite 0.3s;"></div>
+                        <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite 0.6s;"></div>
+                    </div>
+                </div>
+                <style>
+                    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                    @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+                </style>
+            </div>
+        `;
     </script>
+        <div id="treasury-modal-container"></div>
         <div class="tabs">
-            <div class="tab active" onclick="showTab('market')">EMOJI MARKET</div>
-            <div class="tab" onclick="showTab('portfolio')">BAG</div>
-            <div class="tab" onclick="showTab('treasury')">aWIZARD TREASURY</div>
-            <div class="tab" onclick="showTab('howto')">HOW TO CAST</div>
-            <div class="tab" onclick="showTab('book')">BOOK OF WIZARD</div>
-            <div class="tab" onclick="showTab('valley')">CASTER VALLEY</div>
+            <div class="tab" onclick="showTab('market')"><span class="tab-emoji">📈</span> EMOJI MARKET <span class="tab-emoji">📈</span></div>
+            <div class="tab" onclick="showTab('portfolio')"><span class="tab-emoji">💰</span> BAG <span class="tab-emoji">💰</span></div>
+            <div class="tab" onclick="showTab('treasury')"><span class="tab-emoji">🧙</span> aWIZARD TREASURY <span class="tab-emoji">🧙</span></div>
+            <div class="tab" onclick="showTab('howto')"><span class="tab-emoji">🎓</span> HOW TO CAST <span class="tab-emoji">🎓</span></div>
+            <div class="tab" onclick="showTab('book')"><span class="tab-emoji">📜</span> BOOK OF WIZARD <span class="tab-emoji">📜</span></div>
+            <div class="tab" onclick="showTab('valley')"><span class="tab-emoji">🎮</span> CASTER VALLEY <span class="tab-emoji">🎮</span></div>
         </div>
 
-        <div id="market" class="content active">
+        <div id="market" class="content">
             <div class="quick-links">
                 <a href="https://dexie.space" target="_blank" class="quick-link-btn" title="Trade here">🦢 dexie.space</a>
                 <a href="https://mintgarden.io" target="_blank" class="quick-link-btn" title="Chia NFT marketplace and minting">🍃 mintgarden.io</a>
@@ -2061,6 +2106,21 @@
     </div>
 
     <script>
+        // Treasury Loading Modal Functions
+        function showTreasuryLoadingModal() {
+            const container = document.getElementById('treasury-modal-container');
+            if (container && !container.innerHTML) {
+                container.innerHTML = TREASURY_MODAL_HTML;
+            }
+            const modal = document.getElementById('treasury-loading-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+        
+        function hideTreasuryLoadingModal() {
+            const modal = document.getElementById('treasury-loading-modal');
+            if (modal) modal.style.display = 'none';
+        }
+        
         // Tab switching function
         function showTab(tabName) {
             document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
@@ -2070,6 +2130,17 @@
             // Update URL hash so refresh restores the same page
             window.location.hash = tabName;
             if (tabName === "treasury") {
+                // Try to restore from cache first
+                if (_treasuryCache.baseData && _treasuryCache.chiaData && _treasuryCache.nftData) {
+                    console.log('💾 Restoring treasury from cache (' + new Date(_treasuryCache.timestamp).toLocaleTimeString() + ')');
+                    updateTreasuryDisplay(_treasuryCache.baseData, _treasuryCache.chiaData, _treasuryCache.nftData);
+                    window._chiaNFTData = _treasuryCache.nftData;
+                    window._chiaXchPrice = _treasuryCache.chiaData?.xchPrice || 4;
+                    updateNFTGallery(_treasuryCache.nftData);
+                } else {
+                    // Show loading modal and fetch fresh data
+                    showTreasuryLoadingModal();
+                }
                 setTimeout(loadComprehensiveTreasury, 100);
             }
             if (tabName === "valley") {
@@ -3803,17 +3874,20 @@ function updateEmojiMarket(chiaTokens, baseTokens) {
         window.onload = function () {
             // ── Hash-based routing: restore the active tab from URL ──────────
             (function() {
-                const validTabs = ['market', 'portfolio', 'treasury', 'howto', 'book'];
+                const validTabs = ['market', 'portfolio', 'treasury', 'howto', 'book', 'valley'];
                 const hash = window.location.hash.replace('#', '');
-                if (hash && validTabs.includes(hash)) {
-                    const btn = document.querySelector(`.tab[onclick*="'${hash}'"]`);
-                    if (btn) {
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-                        btn.classList.add('active');
-                        const el = document.getElementById(hash);
-                        if (el) el.classList.add('active');
-                        if (hash === 'treasury') setTimeout(loadComprehensiveTreasury, 200);
+                const activeTab = (hash && validTabs.includes(hash)) ? hash : 'market';
+                
+                const btn = document.querySelector(`.tab[onclick*="'${activeTab}'"]`);
+                if (btn) {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    const el = document.getElementById(activeTab);
+                    if (el) el.classList.add('active');
+                    if (activeTab === 'treasury') {
+                        showTreasuryLoadingModal();
+                        setTimeout(loadComprehensiveTreasury, 200);
                     }
                 }
             })();
@@ -4292,7 +4366,16 @@ async function loadComprehensiveTreasury() {
         const nftData = { collections: mergedNFTCols, totalNFTs: mergedNFTCount, totalValue: 0, totalXch: 0, totalCollections: mergedNFTCols.length };
         window._chiaNFTData = nftData;
         window._chiaXchPrice = chiaXchPrice;
+        
+        // Cache the treasury data for quick restoration when switching tabs
+        _treasuryCache.baseData = baseData;
+        _treasuryCache.chiaData = chiaData;
+        _treasuryCache.nftData = nftData;
+        _treasuryCache.timestamp = Date.now();
+        console.log('💾 Treasury data cached for tab switching');
+        
         updateTreasuryDisplay(baseData, chiaData, nftData);
+        hideTreasuryLoadingModal();
         console.log('✅ Treasury display updated');
 
         // ── Background: MintGarden enrichment for NFT collection names ────────────
