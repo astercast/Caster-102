@@ -1200,7 +1200,7 @@
                 <div style="font-size: 32px; margin-bottom: 12px; animation: spin 2s linear infinite;">⏳</div>
                 <div style="font-size: 16px; font-weight: 700; color: #fbbf24; margin-bottom: 8px;">Loading Treasury</div>
                 <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 12px;">
-                    Spacescan rate-limits treasury lookups, so we pace requests to keep data accurate. Thanks for waiting.
+                    Spacescan rate limits mean wallet data loads in waves. Please hang tight while we sync wallets and prices.
                 </div>
                 <div style="display: flex; gap: 8px; justify-content: center;">
                     <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
@@ -1238,23 +1238,6 @@
                         <span>warp.awizard.dev</span>
                     </div>
 
-        <!-- Spotify Mini Player -->
-        <div id="spotify-miniplayer" class="spotify-mini">
-            <div class="spotify-mini-header">
-                <div class="spotify-mini-title">Now Playing: <span id="spotify-mini-album">Album Shuffle</span></div>
-                <div class="spotify-mini-actions">
-                    <a id="spotify-mini-open" class="spotify-mini-btn" href="https://open.spotify.com/" target="_blank" rel="noopener">Open Spotify</a>
-                    <button id="spotify-mini-close" class="spotify-mini-close" title="Close">×</button>
-                </div>
-            </div>
-            <div class="spotify-mini-controls">
-                <button id="spotify-mini-prev" type="button" title="Previous">⏮</button>
-                <button id="spotify-mini-play" type="button" title="Play/Pause">▶</button>
-                <button id="spotify-mini-next" type="button" title="Next">⏭</button>
-                <button id="spotify-mini-shuffle" type="button" title="Shuffle Albums">Shuffle Albums</button>
-            </div>
-            <div id="spotify-embed" class="spotify-mini-embed"></div>
-        </div>
                 </a>
                 <a href="https://discord.gg/awizard" target="_blank" class="quick-link-btn" style="border: none; color: #5865F2; box-shadow: 0 0 12px rgba(88, 101, 242, 0.4);" title="Chat and verify your wallet">💬 discord.gg/awizard</a>
             </div>
@@ -4039,6 +4022,24 @@ function updateEmojiMarket(chiaTokens, baseTokens) {
         };
     </script>
 
+    <!-- Spotify Mini Player -->
+    <div id="spotify-miniplayer" class="spotify-mini">
+        <div class="spotify-mini-header">
+            <div class="spotify-mini-title">Now Playing: <span id="spotify-mini-album">Album Shuffle</span></div>
+            <div class="spotify-mini-actions">
+                <a id="spotify-mini-open" class="spotify-mini-btn" href="https://open.spotify.com/" target="_blank" rel="noopener">Open Spotify</a>
+                <button id="spotify-mini-close" class="spotify-mini-close" title="Close">×</button>
+            </div>
+        </div>
+        <div class="spotify-mini-controls">
+            <button id="spotify-mini-prev" type="button" title="Previous">⏮</button>
+            <button id="spotify-mini-play" type="button" title="Play/Pause">▶</button>
+            <button id="spotify-mini-next" type="button" title="Next">⏭</button>
+            <button id="spotify-mini-shuffle" type="button" title="Shuffle Albums">Shuffle Albums</button>
+        </div>
+        <div id="spotify-embed" class="spotify-mini-embed"></div>
+    </div>
+
     <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
     <script>
         (function() {
@@ -4498,7 +4499,7 @@ async function loadComprehensiveTreasury() {
         // ── Show loading placeholder ───────────────────────────────────────────────
         const chiaList = document.getElementById('chia-holdings-list');
         if (chiaList) chiaList.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.4);font-size:12px;">
-            Loading Chia holdings…</div>`;
+            <div style="font-size:24px;margin-bottom:8px;">⏳</div>Loading Chia holdings…</div>`;
 
         // ── CALL CHIA-CAT-PRICES LAMBDA (treasury mode) ──────────────────────────
         console.log('📡 Calling chia-cat-prices Lambda (treasury mode)...');
