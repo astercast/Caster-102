@@ -2963,62 +2963,126 @@
                 const plantGroup = new THREE.Group();
                 const color = SEED_TIERS[tier - 1].color;
                 const stem = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.05, 0.07, 0.45, 6),
-                    new THREE.MeshLambertMaterial({ color: 0x4a7c3a })
+                    new THREE.CylinderGeometry(0.06, 0.09, 0.5, 8),
+                    new THREE.MeshLambertMaterial({ color: 0x3d6b2f })
                 );
-                stem.position.y = 0.23;
+                stem.position.y = 0.25;
                 plantGroup.add(stem);
+                
+                // Add green leaves to stem
+                for (let i = 0; i < 4; i++) {
+                    const leaf = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.08, 0.15, 0.03),
+                        new THREE.MeshLambertMaterial({ color: 0x5d8c3f })
+                    );
+                    const angle = (i / 4) * Math.PI * 2;
+                    leaf.position.set(
+                        Math.cos(angle) * 0.08,
+                        0.2 + i * 0.08,
+                        Math.sin(angle) * 0.08
+                    );
+                    leaf.rotation.z = angle + Math.PI / 4;
+                    plantGroup.add(leaf);
+                }
+                
                 plantGroup.userData = { tier, swayPhase: Math.random() * Math.PI * 2 };
                 
                 if (tier === 1) {
-                    // Tier 1: Small round bush
-                    const bush = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.25, 8, 8),
-                        new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.3 })
-                    );
-                    bush.position.y = 0.25;
-                    bush.scale.set(1, 0.7, 1);
-                    plantGroup.add(bush);
-                } else if (tier === 2) {
-                    // Tier 2: Flower with petals
+                    // Tier 1: Blooming flower with colorful petals
                     const center = new THREE.Mesh(
                         new THREE.SphereGeometry(0.12, 8, 8),
-                        new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.5 })
+                        new THREE.MeshLambertMaterial({ color: 0xffeb3b, emissive: 0xffeb3b, emissiveIntensity: 0.5 })
                     );
                     center.position.y = 0.5;
                     plantGroup.add(center);
                     
-                    // 5 petals
-                    for (let i = 0; i < 5; i++) {
-                        const angle = (i / 5) * Math.PI * 2;
+                    // 6 colorful petals
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i / 6) * Math.PI * 2;
                         const petal = new THREE.Mesh(
-                            new THREE.SphereGeometry(0.1, 6, 6),
+                            new THREE.SphereGeometry(0.12, 8, 8),
                             new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.4 })
                         );
                         petal.position.set(
-                            Math.cos(angle) * 0.18,
+                            Math.cos(angle) * 0.22,
                             0.5,
-                            Math.sin(angle) * 0.18
+                            Math.sin(angle) * 0.22
                         );
-                        petal.scale.set(1, 0.4, 1);
+                        petal.scale.set(1.2, 0.9, 0.8);
+                        plantGroup.add(petal);
+                    }
+                } else if (tier === 2) {
+                    // Tier 2: Double-layer rose-like flower
+                    const center = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.15, 8, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xffe74c, emissive: 0xffe74c, emissiveIntensity: 0.6 })
+                    );
+                    center.position.y = 0.55;
+                    plantGroup.add(center);
+                    
+                    // Outer layer - 8 large petals
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        const petal = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.13, 8, 8),
+                            new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.5 })
+                        );
+                        petal.position.set(
+                            Math.cos(angle) * 0.25,
+                            0.5,
+                            Math.sin(angle) * 0.25
+                        );
+                        petal.scale.set(1.3, 1.1, 0.7);
+                        petal.rotation.z = Math.PI / 6;
+                        plantGroup.add(petal);
+                    }
+                    
+                    // Inner layer - 6 slightly smaller petals
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i / 6) * Math.PI * 2 + Math.PI / 6;
+                        const petal = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.1, 8, 8),
+                            new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.4 })
+                        );
+                        petal.position.set(
+                            Math.cos(angle) * 0.15,
+                            0.55,
+                            Math.sin(angle) * 0.15
+                        );
+                        petal.scale.set(1.1, 0.9, 0.6);
                         plantGroup.add(petal);
                     }
                 } else if (tier === 3) {
-                    // Tier 3: Crystal cluster
-                    for (let i = 0; i < 3; i++) {
+                    // Tier 3: Crystal flower cluster with light glow
+                    const base = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.15, 0.3, 0.15),
+                        new THREE.MeshLambertMaterial({ color: 0x7cb342 })
+                    );
+                    base.position.y = 0.15;
+                    plantGroup.add(base);
+                    
+                    for (let i = 0; i < 4; i++) {
                         const crystal = new THREE.Mesh(
-                            new THREE.ConeGeometry(0.08, 0.5, 6),
-                            new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.5 })
+                            new THREE.ConeGeometry(0.1, 0.6, 6),
+                            new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.6 })
                         );
-                        const angle = (i / 3) * Math.PI * 2;
+                        const angle = (i / 4) * Math.PI * 2;
                         crystal.position.set(
-                            Math.cos(angle) * 0.12,
-                            0.35,
-                            Math.sin(angle) * 0.12
+                            Math.cos(angle) * 0.15,
+                            0.45,
+                            Math.sin(angle) * 0.15
                         );
-                        crystal.rotation.z = Math.PI * 0.15;
+                        crystal.rotation.z = angle + Math.PI * 0.2;
                         plantGroup.add(crystal);
                     }
+                    
+                    // Top crystal point
+                    const topCrystal = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.08, 0.4, 6),
+                        new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.8 })
+                    );
+                    topCrystal.position.y = 0.7;
+                    plantGroup.add(topCrystal);
                 } else if (tier === 4) {
                     // Tier 4: Lotus-like floating flower
                     const base = new THREE.Mesh(
@@ -3473,6 +3537,7 @@
                         this.unlockedAreas.mine = true;
                         this.showToast('⛏️ Mine unlocked!');
                         this.updateUI();
+                        this.updateAreaTabs();
                     } else {
                         this.showToast('Need 200 SP');
                         return;
@@ -3483,6 +3548,7 @@
                         this.unlockedAreas.forest = true;
                         this.showToast('🌲 Forest unlocked!');
                         this.updateUI();
+                        this.updateAreaTabs();
                     } else {
                         this.showToast('Need 1000 SP');
                         return;
@@ -3493,6 +3559,7 @@
                         this.unlockedAreas.fishing = true;
                         this.showToast('🎣 Fishing unlocked!');
                         this.updateUI();
+                        this.updateAreaTabs();
                     } else {
                         this.showToast('Need 3000 SP');
                         return;
@@ -3502,6 +3569,7 @@
                     if (this.completedAchievements.length >= required) {
                         this.unlockedAreas.astral = true;
                         this.showToast('✨ Astral unlocked!');
+                        this.updateAreaTabs();
                     } else {
                         this.showToast(`Need ${required - this.completedAchievements.length} more!`);
                         return;
@@ -3838,18 +3906,32 @@
                     }
                 }
                 
-                // Update locked states
-                if (!this.unlockedAreas.mine) {
-                    const mineTab = document.getElementById('mine-tab');
-                    if (mineTab) mineTab.classList.add('locked');
+                // Update locked/unlocked states for all areas
+                const mineTab = document.getElementById('mine-tab');
+                if (mineTab) {
+                    if (!this.unlockedAreas.mine) {
+                        mineTab.classList.add('locked');
+                    } else {
+                        mineTab.classList.remove('locked');
+                    }
                 }
-                if (!this.unlockedAreas.forest) {
-                    const forestTab = document.getElementById('forest-tab');
-                    if (forestTab) forestTab.classList.add('locked');
+                
+                const forestTab = document.getElementById('forest-tab');
+                if (forestTab) {
+                    if (!this.unlockedAreas.forest) {
+                        forestTab.classList.add('locked');
+                    } else {
+                        forestTab.classList.remove('locked');
+                    }
                 }
-                if (!this.unlockedAreas.fishing) {
-                    const fishingTab = document.getElementById('fishing-tab');
-                    if (fishingTab) fishingTab.classList.add('locked');
+                
+                const fishingTab = document.getElementById('fishing-tab');
+                if (fishingTab) {
+                    if (!this.unlockedAreas.fishing) {
+                        fishingTab.classList.add('locked');
+                    } else {
+                        fishingTab.classList.remove('locked');
+                    }
                 }
             },
 
@@ -4064,7 +4146,7 @@
                             plot.growthTime += 100 * speedMult * (1 + this.plantSpeed);
                             const progress = Math.min(plot.growthTime / plot.growthNeeded, 1);
                             // Bigger final size: 0.3 + progress * 1.2 → 0.4 + progress * 2.0
-                            const targetScale = 0.7 + progress * 1.6; // Grows from 0.7 to 2.3
+                            const targetScale = 0.6 + progress * 2.8; // Grows from 0.6 to 3.4 - much bigger!
                             // Smooth scale interpolation
                             const currentScale = plot.plantMesh.scale.x;
                             const newScale = currentScale + (targetScale - currentScale) * 0.1;
