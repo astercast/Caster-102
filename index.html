@@ -952,6 +952,144 @@
                 min-height: 250px !important;
             }
         }
+
+        /* Spotify Mini Player */
+        .spotify-mini {
+            position: fixed;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            margin: 0 auto;
+            max-width: 720px;
+            background: linear-gradient(135deg, rgba(8, 12, 20, 0.95), rgba(16, 20, 30, 0.92));
+            border: 1px solid rgba(29, 185, 84, 0.35);
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 30px rgba(29, 185, 84, 0.08);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            padding: 12px 14px 10px;
+        }
+
+        .spotify-mini-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .spotify-mini-title {
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+        }
+
+        .spotify-mini-title span {
+            color: #1db954;
+            font-weight: 700;
+        }
+
+        .spotify-mini-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spotify-mini-btn {
+            border: 1px solid rgba(29, 185, 84, 0.45);
+            background: rgba(29, 185, 84, 0.15);
+            color: #b7f3cc;
+            font-size: 10px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .spotify-mini-btn:hover {
+            background: rgba(29, 185, 84, 0.25);
+            border-color: rgba(29, 185, 84, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .spotify-mini-close {
+            border: none;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.7);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            transition: all 0.2s ease;
+        }
+
+        .spotify-mini-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .spotify-mini-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .spotify-mini-controls button {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .spotify-mini-controls button:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .spotify-mini-embed {
+            width: 100%;
+            height: 152px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .spotify-mini {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                padding: 10px 12px 8px;
+            }
+
+            .spotify-mini-title {
+                font-size: 10px;
+                letter-spacing: 0.6px;
+            }
+
+            .spotify-mini-controls {
+                flex-wrap: wrap;
+            }
+
+            .spotify-mini-embed {
+                height: 128px;
+            }
+        }
     </style>
 </head>
 
@@ -1062,7 +1200,7 @@
                 <div style="font-size: 32px; margin-bottom: 12px; animation: spin 2s linear infinite;">⏳</div>
                 <div style="font-size: 16px; font-weight: 700; color: #fbbf24; margin-bottom: 8px;">Loading Treasury</div>
                 <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 12px;">
-                    Fetching wallets & prices...
+                    Spacescan rate-limits treasury lookups, so we pace requests to keep data accurate. Thanks for waiting.
                 </div>
                 <div style="display: flex; gap: 8px; justify-content: center;">
                     <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
@@ -1099,6 +1237,24 @@
                     <div style="display: flex; flex-direction: column; line-height: 1;">
                         <span>warp.awizard.dev</span>
                     </div>
+
+        <!-- Spotify Mini Player -->
+        <div id="spotify-miniplayer" class="spotify-mini">
+            <div class="spotify-mini-header">
+                <div class="spotify-mini-title">Now Playing: <span id="spotify-mini-album">Album Shuffle</span></div>
+                <div class="spotify-mini-actions">
+                    <a id="spotify-mini-open" class="spotify-mini-btn" href="https://open.spotify.com/" target="_blank" rel="noopener">Open Spotify</a>
+                    <button id="spotify-mini-close" class="spotify-mini-close" title="Close">×</button>
+                </div>
+            </div>
+            <div class="spotify-mini-controls">
+                <button id="spotify-mini-prev" type="button" title="Previous">⏮</button>
+                <button id="spotify-mini-play" type="button" title="Play/Pause">▶</button>
+                <button id="spotify-mini-next" type="button" title="Next">⏭</button>
+                <button id="spotify-mini-shuffle" type="button" title="Shuffle Albums">Shuffle Albums</button>
+            </div>
+            <div id="spotify-embed" class="spotify-mini-embed"></div>
+        </div>
                 </a>
                 <a href="https://discord.gg/awizard" target="_blank" class="quick-link-btn" style="border: none; color: #5865F2; box-shadow: 0 0 12px rgba(88, 101, 242, 0.4);" title="Chat and verify your wallet">💬 discord.gg/awizard</a>
             </div>
@@ -3883,6 +4039,122 @@ function updateEmojiMarket(chiaTokens, baseTokens) {
         };
     </script>
 
+    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+    <script>
+        (function() {
+            const albums = [
+                { uri: 'spotify:album:0EMrZkL3qXmiwcHVTgmAiO', label: 'Album A' },
+                { uri: 'spotify:album:0CwFHInuT37IygomIdyrul', label: 'Album B' },
+            ];
+
+            const ui = {
+                container: document.getElementById('spotify-miniplayer'),
+                album: document.getElementById('spotify-mini-album'),
+                open: document.getElementById('spotify-mini-open'),
+                close: document.getElementById('spotify-mini-close'),
+                play: document.getElementById('spotify-mini-play'),
+                prev: document.getElementById('spotify-mini-prev'),
+                next: document.getElementById('spotify-mini-next'),
+                shuffle: document.getElementById('spotify-mini-shuffle'),
+            };
+
+            let controller = null;
+            let currentIndex = 0;
+            let isPaused = true;
+
+            const pickRandomIndex = (exclude) => {
+                if (albums.length <= 1) return 0;
+                let idx = Math.floor(Math.random() * albums.length);
+                if (idx === exclude) idx = (idx + 1) % albums.length;
+                return idx;
+            };
+
+            const updateAlbumUI = () => {
+                const current = albums[currentIndex];
+                if (ui.album) ui.album.textContent = current.label;
+                if (ui.open) ui.open.href = `https://open.spotify.com/album/${current.uri.split(':')[2]}`;
+            };
+
+            const loadAlbum = (index, autoplay) => {
+                currentIndex = index;
+                updateAlbumUI();
+                if (controller) {
+                    controller.loadUri(albums[currentIndex].uri);
+                    if (autoplay) {
+                        setTimeout(() => {
+                            if (isPaused) controller.togglePlay();
+                        }, 300);
+                    }
+                }
+            };
+
+            const updatePlayButton = () => {
+                if (!ui.play) return;
+                ui.play.textContent = isPaused ? '▶' : '⏸';
+            };
+
+            if (ui.close && ui.container) {
+                ui.close.addEventListener('click', () => {
+                    ui.container.style.display = 'none';
+                    if (controller && !isPaused) controller.togglePlay();
+                });
+            }
+
+            if (ui.play) {
+                ui.play.addEventListener('click', () => {
+                    if (controller) controller.togglePlay();
+                });
+            }
+
+            if (ui.prev) {
+                ui.prev.addEventListener('click', () => {
+                    if (controller) controller.previous();
+                });
+            }
+
+            if (ui.next) {
+                ui.next.addEventListener('click', () => {
+                    if (controller) controller.next();
+                });
+            }
+
+            if (ui.shuffle) {
+                ui.shuffle.addEventListener('click', () => {
+                    const nextIndex = pickRandomIndex(currentIndex);
+                    loadAlbum(nextIndex, true);
+                });
+            }
+
+            window.onSpotifyIframeApiReady = (IFrameAPI) => {
+                const element = document.getElementById('spotify-embed');
+                if (!element) return;
+
+                currentIndex = pickRandomIndex(-1);
+                updateAlbumUI();
+
+                IFrameAPI.createController(element, {
+                    uri: albums[currentIndex].uri,
+                    width: '100%',
+                    height: 152,
+                    theme: 'dark'
+                }, (ctrl) => {
+                    controller = ctrl;
+
+                    ctrl.addListener('playback_update', (e) => {
+                        if (e && e.data) {
+                            isPaused = !!e.data.isPaused;
+                            updatePlayButton();
+                        }
+                    });
+
+                    ctrl.addListener('ready', () => {
+                        updatePlayButton();
+                    });
+                });
+            };
+        })();
+    </script>
+
     <!-- COMPREHENSIVE TREASURY & MARKET LOADER -->
     <script>
 // =================================================================
@@ -4226,7 +4498,7 @@ async function loadComprehensiveTreasury() {
         // ── Show loading placeholder ───────────────────────────────────────────────
         const chiaList = document.getElementById('chia-holdings-list');
         if (chiaList) chiaList.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.4);font-size:12px;">
-            <div style="font-size:24px;margin-bottom:8px;">⏳</div>Loading Chia holdings…</div>`;
+            Loading Chia holdings…</div>`;
 
         // ── CALL CHIA-CAT-PRICES LAMBDA (treasury mode) ──────────────────────────
         console.log('📡 Calling chia-cat-prices Lambda (treasury mode)...');
