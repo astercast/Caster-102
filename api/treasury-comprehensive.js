@@ -15,9 +15,6 @@ const HEADERS = {
     'Content-Type': 'application/json'
 };
 
-const SNAPSHOT_TTL_MS = 3 * 60 * 60 * 1000;
-let _snapshotCache = { ts: 0, data: null, inFlight: null };
-
 // Multiple RPC endpoints — round-robin on failure to avoid rate limits
 const BASE_RPCS = [
     'https://base-rpc.publicnode.com',
@@ -580,115 +577,6 @@ async function fetchChiaFull(address1, address2) {
     return { tokens, total: tokenTotal, nfts, nftCount: rawNfts.length };
 }
 
-function mergeBaseSnapshot(base1, base2) {
-    const lp1 = (base1.tokens || []).filter(t => t.type === 'lp');
-    const lp2 = (base2.tokens || []).filter(t => t.type === 'lp');
-    const reg = [...(base1.tokens || []).filter(t => t.type !== 'lp'), ...(base2.tokens || []).filter(t => t.type !== 'lp')];
-    const map = new Map();
-    for (const t of reg) {
-        const key = (t.contract || t.symbol || '').toLowerCase();
-        if (!map.has(key)) map.set(key, { ...t });
-        else {
-            const ex = map.get(key);
-            ex.balance = (ex.balance || 0) + (t.balance || 0);
-            ex.value = (ex.value || 0) + (t.value || 0);
-            if (!ex.price && t.price) ex.price = t.price;
-        }
-    }
-    const tokens = [...map.values(), ...lp1, ...lp2];
-    const total = (base1.total || 0) + (base2.total || 0);
-    return { tokens, total };
-}
-
-function mergeChiaSnapshot(chiaFull, chia3) {
-    const map = new Map();
-    const addTokens = (list) => {
-        for (const t of list || []) {
-            const key = (t.assetId || t.symbol || '').toLowerCase();
-            if (!map.has(key)) map.set(key, { ...t });
-            else {
-                const ex = map.get(key);
-                ex.balance = (ex.balance || 0) + (t.balance || 0);
-                ex.value = (ex.value || 0) + (t.value || 0);
-                if (!ex.price && t.price) ex.price = t.price;
-            }
-        }
-    };
-    addTokens(chiaFull.tokens || []);
-    addTokens(chia3.tokens || []);
-    const tokens = Array.from(map.values()).sort((a, b) => (b.value || 0) - (a.value || 0));
-    const total = tokens.reduce((s, t) => s + (t.value || 0), 0);
-    return { tokens, total };
-}
-
-function mergeNftCollections(cols1 = [], cols2 = []) {
-    const map = new Map();
-    for (const col of [...cols1, ...cols2]) {
-        const key = col.id || col.colId || col.name || 'uncategorized';
-        if (!map.has(key)) {
-            map.set(key, { ...col });
-        } else {
-            const ex = map.get(key);
-            ex.count = (ex.count || 0) + (col.count || 0);
-            if (!ex.image && col.image) ex.image = col.image;
-            if (!ex.name && col.name) ex.name = col.name;
-        }
-    }
-    return Array.from(map.values()).sort((a, b) => (b.count || 0) - (a.count || 0));
-}
-
-async function buildTreasurySnapshot() {
-    const BASE_WALLET_1 = '0x8d8cb6D19E32115823Cf0008701A84fB07F43467';
-    const BASE_WALLET_2 = '0xEEDC069F861880eC1B5f41c9bC7a747DC1cE32b9';
-    const CHIA_WALLET_1 = 'xch10na8nqys9afs0fl74vvd6xl3akgu77p8mvjsp2ywy7rhq2s0jqys3nf7dl';
-    const CHIA_WALLET_2 = 'xch1g477lha2wjjq9634kgqmryf4gplft9cjgv2vd29tq3ya26glwlkqp6pyex';
-    const CHIA_WALLET_3 = 'xch1el40ydk4v2ccdq2l8d28wvr8hnndar0xywfgqel36f85ps8gj9jqfrm64j';
-
-    const [base1, base2] = await Promise.all([
-        fetchBase(BASE_WALLET_1),
-        fetchBase(BASE_WALLET_2)
-    ]);
-    const baseData = mergeBaseSnapshot(base1, base2);
-
-    const [chiaFull, chia3Tokens, chia3Nfts, xchPrice] = await Promise.all([
-        fetchChiaFull(CHIA_WALLET_1, CHIA_WALLET_2),
-        fetchChiaTokens(CHIA_WALLET_3),
-        fetchChiaNFTs(CHIA_WALLET_3),
-        getXchPrice()
-    ]);
-    const chiaData = mergeChiaSnapshot(chiaFull, chia3Tokens);
-    chiaData.xchPrice = xchPrice;
-
-    const mergedCollections = mergeNftCollections(chiaFull.nfts || [], (chia3Nfts.nfts || []));
-    const totalNFTs = mergedCollections.reduce((s, c) => s + (c.count || 0), 0);
-    const nfts = {
-        collections: mergedCollections,
-        totalNFTs,
-        totalCollections: mergedCollections.length,
-        totalXch: 0,
-        totalValue: 0
-    };
-
-    return {
-        updatedAt: Date.now(),
-        base: baseData,
-        chia: chiaData,
-        nfts
-    };
-}
-
-async function getTreasurySnapshot() {
-    const now = Date.now();
-    if (_snapshotCache.data && now - _snapshotCache.ts < SNAPSHOT_TTL_MS) return _snapshotCache.data;
-    if (_snapshotCache.inFlight) return _snapshotCache.inFlight;
-    _snapshotCache.inFlight = (async () => {
-        const data = await buildTreasurySnapshot();
-        _snapshotCache = { ts: Date.now(), data, inFlight: null };
-        return data;
-    })();
-    return _snapshotCache.inFlight;
-}
-
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
@@ -696,17 +584,6 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     const p = req.query || {};
-
-    // treasury snapshot mode
-    if (p.snapshot === '1') {
-        res.setHeader('Cache-Control', 's-maxage=10800, stale-while-revalidate=3600');
-        try {
-            const snap = await getTreasurySnapshot();
-            return res.status(200).json(snap);
-        } catch (err) {
-            return res.status(200).json({ error: err.message });
-        }
-    }
 
     // chia full mode (combined tokens + NFTs)
     if (p.chain === 'chia' && p.type === 'full') {
