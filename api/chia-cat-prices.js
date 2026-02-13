@@ -90,7 +90,10 @@ async function getSpacescanPrice(assetId) {
         const d = await r.json();
         const price = parseFloat(d?.data?.amount_price || 0);
         if (price <= 0) return null;
-        return { price, change: parseFloat(d?.data?.pricepercentage || 0), mcap: parseFloat(d?.data?.circulating_supply || 0) * price, source: 'spacescan' };
+        // Use circulating supply if available, otherwise use total supply
+        const supply = parseFloat(d?.data?.circulating_supply || d?.data?.total_supply || 0);
+        const mcap = supply > 0 ? supply * price : parseFloat(d?.data?.market_cap || 0);
+        return { price, change: parseFloat(d?.data?.pricepercentage || 0), mcap, source: 'spacescan' };
     } catch (_) { return null; }
 }
 
