@@ -16,11 +16,12 @@
             font-family: 'Nunito', sans-serif; background: linear-gradient(180deg, var(--blue-sky) 0%, var(--green-light) 100%);
             color: var(--brown-dark); overflow: hidden; height: 100vh; touch-action: none;
             transition: background 1.5s ease; /* Smooth day/night transition */
+            transform: scale(0.8); transform-origin: top left; width: 125%; height: 125%;
         }
         body.night-mode {
             background: linear-gradient(180deg, #1a1a3e 0%, #0f1a2e 100%);
         }
-        #game-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; }
+        #game-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; max-width: 1600px; max-height: 900px; }
         #hud {
             background: linear-gradient(180deg, var(--brown-light) 0%, var(--brown-med) 100%); border-bottom: 4px solid var(--brown-dark);
             box-shadow: 0 4px 0 var(--brown-dark), inset 0 2px 0 var(--sand); padding: 12px; display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; align-items: center; z-index: 100;
@@ -491,7 +492,24 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        const SAVE_VERSION = 2;
+        const SAVE_VERSION = 3; // Incremented for migration
+
+        // Save migration handlers - add here when format changes
+        const SAVE_MIGRATIONS = {
+            // Example: 1: (save) => { save.newField = defaultValue; return save; }
+        };
+
+        function migrateSave(save) {
+            if (!save.version) save.version = 1;
+            for (let v = save.version; v < SAVE_VERSION; v++) {
+                if (SAVE_MIGRATIONS[v]) {
+                    console.log(`🔄 Migrating save from v${v} to v${v + 1}`);
+                    save = SAVE_MIGRATIONS[v](save);
+                }
+            }
+            save.version = SAVE_VERSION;
+            return save;
+        }
         const SEED_TIERS = [
             { tier: 1, icon: '🌱', color: 0xc9562c, sp: 3, sellPrice: 2, name: 'Embersprout' },
             { tier: 2, icon: '🌺', color: 0xf4a261, sp: 8, sellPrice: 5, name: 'Sunpetal' },
@@ -642,11 +660,28 @@
                         stats: this.stats, completedAchievements: this.completedAchievements, fishInventory: this.fishInventory,
                         shownFirstFishNotif: this.shownFirstFishNotif, version: SAVE_VERSION, savedAt: Date.now()
                     };
-                    localStorage.setItem('casterValleySave', JSON.stringify(saveData));
+                    
+                    const saveJson = JSON.stringify(saveData);
+                    
+                    // Create backup before overwriting (in case of corruption)
+                    const existing = localStorage.getItem('casterValleySave');
+                    if (existing && existing.length > 100) { // Only backup if valid
+                        localStorage.setItem('casterValleySaveBackup', existing);
+                    }
+                    
+                    // Save to primary storage
+                    localStorage.setItem('casterValleySave', saveJson);
                     this.lastSave = Date.now();
+                    
+                    // Queue cloud sync with backoff to prevent API spam
                     this.queueCloudSave(saveData);
+                    
+                    // Log save size for debugging
+                    if (Math.random() < 0.1) { // 10% of saves
+                        console.log(`💾 Saved ${(saveJson.length / 1024).toFixed(1)}KB`);
+                    }
                 } catch (e) {
-                    console.error('Save failed:', e);
+                    console.error('❌ Save failed:', e);
                 }
             },
 
@@ -654,13 +689,27 @@
                 try {
                     const saved = localStorage.getItem('casterValleySave');
                     if (saved) {
-                        const d = JSON.parse(saved);
+                        let d = JSON.parse(saved);
+                        // If save has old version, migrate it
+                        if (d.version !== SAVE_VERSION) {
+                            console.log(`📦 Save is v${d.version}, current is v${SAVE_VERSION}`);
+                            d = migrateSave(d);
+                        }
                         this.applySaveData(d);
-                        console.log('✅ Game loaded!');
+                        console.log('✅ Game loaded from localStorage!');
                         return d.savedAt || 0;
                     }
                 } catch (e) {
-                    console.error('Load failed:', e);
+                    console.error('❌ Load failed:', e);
+                    // Attempted to load but failed - try backup
+                    try {
+                        const backup = localStorage.getItem('casterValleySaveBackup');
+                        if (backup) {
+                            console.log('🔧 Recovering from backup...');
+                            localStorage.setItem('casterValleySave', backup);
+                            return this.loadGame(); // Recursive call to load backup
+                        }
+                    } catch (_) {}
                 }
                 return 0;
             },
@@ -699,20 +748,37 @@
                 try {
                     if (!this.deviceId) return;
                     const resp = await fetch(`/api/caster-valley-save?deviceId=${encodeURIComponent(this.deviceId)}`);
-                    if (!resp.ok) return;
+                    if (!resp.ok) {
+                        console.warn(`⚠️ Cloud load returned ${resp.status}`);
+                        return;
+                    }
                     const data = await resp.json();
                     const cloud = data?.save;
-                    if (!cloud || !cloud.savedAt) return;
+                    if (!cloud || !cloud.savedAt) {
+                        console.log('☁️ No cloud save found (first time or fresh device)');
+                        return;
+                    }
+                    
+                    // Migrate cloud save if needed
+                    if (cloud.version !== SAVE_VERSION) {
+                        console.log(`🔄 Cloud save is v${cloud.version}, migrating to v${SAVE_VERSION}`);
+                        cloud = migrateSave(cloud);
+                    }
+                    
+                    // Use cloud save if it's newer than local
                     if (cloud.savedAt > (localSavedAt || 0)) {
+                        console.log(`📥 Using cloud save (${new Date(cloud.savedAt).toLocaleTimeString()})`);
                         this.applySaveData(cloud);
                         localStorage.setItem('casterValleySave', JSON.stringify(cloud));
                         this.lastSave = Date.now();
                         this.updateUI();
                         this.renderToolbar();
                         this.renderStore();
+                    } else {
+                        console.log('✅ Local save is newer, keeping it');
                     }
                 } catch (e) {
-                    console.warn('Cloud load failed:', e.message);
+                    console.warn('⚠️ Cloud load failed:', e.message);
                 }
             },
 
