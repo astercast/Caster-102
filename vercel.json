@@ -21,6 +21,9 @@
     },
     "api/spacescan-proxy.js": {
       "maxDuration": 20
+    },
+    "api/caster-valley-save.js": {
+      "maxDuration": 15
     }
   }
 }

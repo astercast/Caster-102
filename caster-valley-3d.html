@@ -155,7 +155,7 @@
             display: flex; flex-direction: column; gap: 8px;
         }
         .left-tab {
-            width: 70px; height: 60px; background: linear-gradient(135deg, var(--green-med), var(--green-dark));
+            width: 56px; height: 50px; background: linear-gradient(135deg, var(--green-med), var(--green-dark));
             border: 3px solid var(--brown-dark); border-radius: 10px; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
@@ -175,10 +175,10 @@
             transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         .left-tab-icon {
-            font-size: 28px; filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.7));
+            font-size: 22px; filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.7));
         }
         .left-tab-label {
-            font-family: 'Press Start 2P'; font-size: 6px; color: white; text-align: center;
+            font-family: 'Press Start 2P'; font-size: 5px; color: white; text-align: center;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.9); margin-top: 2px;
         }
         
@@ -432,15 +432,15 @@
                         <div class="tutorial-text">• Drag seeds to plots<br>• Tap glowing plants<br>• Get SP + seeds!</div>
                     </div>
                     <div class="tutorial-section">
-                        <div class="tutorial-title">⛏️ Mine (200 SP)</div>
+                        <div class="tutorial-title">⛏️ Mine (150 SP)</div>
                         <div class="tutorial-text">• Tap rocks<br>• Quick SP</div>
                     </div>
                     <div class="tutorial-section">
-                        <div class="tutorial-title">⚔️ Forest (1000 SP)</div>
+                        <div class="tutorial-title">⚔️ Forest (800 SP)</div>
                         <div class="tutorial-text">• Fight trolls<br>• Big rewards<br>• <strong>Feed fish to dragon!</strong></div>
                     </div>
                     <div class="tutorial-section">
-                        <div class="tutorial-title">🎣 Fishing (3000 SP)</div>
+                        <div class="tutorial-title">🎣 Fishing (2200 SP)</div>
                         <div class="tutorial-text">• Tap swimming fish<br>• Collect fish inventory<br>• Feed to dragon in forest!</div>
                     </div>
                     <div class="tutorial-section">
@@ -491,6 +491,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        const SAVE_VERSION = 2;
         const SEED_TIERS = [
             { tier: 1, icon: '🌱', color: 0xc9562c, sp: 3, sellPrice: 2, name: 'Embersprout' },
             { tier: 2, icon: '🌺', color: 0xf4a261, sp: 8, sellPrice: 5, name: 'Sunpetal' },
@@ -506,71 +507,73 @@
         
         const SKILLS = [
             // Column 1 - GROWTH (left side, x: 40)
-            { id: 'growth1', name: 'Growth I', desc: 'Plants grow 20% faster. Essential for early game farming efficiency.', cost: 100, stat: 'plantSpeed', value: 0.2, icon: '🌱', x: 40, y: 60 },
-            { id: 'growth2', name: 'Growth II', desc: 'Plants grow 40% faster total. Significantly speeds up crop cycles.', cost: 400, stat: 'plantSpeed', value: 0.2, icon: '🌿', x: 40, y: 125, requires: ['growth1'] },
-            { id: 'growth3', name: 'Growth III', desc: 'Plants grow 70% faster total. Massive productivity boost!', cost: 1200, stat: 'plantSpeed', value: 0.3, icon: '🌳', x: 40, y: 190, requires: ['growth2'] },
-            { id: 'growth4', name: 'Growth IV', desc: 'Plants grow 110% faster total. Double speed farming!', cost: 3500, stat: 'plantSpeed', value: 0.4, icon: '🌲', x: 40, y: 255, requires: ['growth3'] },
-            { id: 'growth5', name: 'Growth V', desc: 'Plants grow 160% faster total. Ultimate farming speed!', cost: 9000, stat: 'plantSpeed', value: 0.5, icon: '🎋', x: 40, y: 320, requires: ['growth4'] },
+            { id: 'growth1', name: 'Growth I', desc: 'Plants grow 20% faster. Essential for early game farming efficiency.', cost: 80, stat: 'plantSpeed', value: 0.2, icon: '🌱', x: 40, y: 60 },
+            { id: 'growth2', name: 'Growth II', desc: 'Plants grow 40% faster total. Significantly speeds up crop cycles.', cost: 250, stat: 'plantSpeed', value: 0.2, icon: '🌿', x: 40, y: 125, requires: ['growth1'] },
+            { id: 'growth3', name: 'Growth III', desc: 'Plants grow 70% faster total. Massive productivity boost!', cost: 700, stat: 'plantSpeed', value: 0.3, icon: '🌳', x: 40, y: 190, requires: ['growth2'] },
+            { id: 'growth4', name: 'Growth IV', desc: 'Plants grow 110% faster total. Double speed farming!', cost: 2000, stat: 'plantSpeed', value: 0.4, icon: '🌲', x: 40, y: 255, requires: ['growth3'] },
+            { id: 'growth5', name: 'Growth V', desc: 'Plants grow 160% faster total. Ultimate farming speed!', cost: 5000, stat: 'plantSpeed', value: 0.5, icon: '🎋', x: 40, y: 320, requires: ['growth4'] },
             
             // Column 2 - BOUNTY (x: 110)
-            { id: 'bounty1', name: 'Bounty I', desc: 'Gain 25% more SP from all sources. Your first multiplier!', cost: 200, stat: 'essenceMult', value: 0.25, icon: '💎', x: 110, y: 60 },
-            { id: 'bounty2', name: 'Bounty II', desc: 'Gain 50% more SP total. Major income boost!', cost: 700, stat: 'essenceMult', value: 0.25, icon: '💎', x: 110, y: 125, requires: ['bounty1'] },
-            { id: 'bounty3', name: 'Bounty III', desc: 'Gain 80% more SP total. Wealth accelerator!', cost: 1800, stat: 'essenceMult', value: 0.3, icon: '💰', x: 110, y: 190, requires: ['bounty2'] },
-            { id: 'bounty4', name: 'Bounty IV', desc: 'Gain 120% more SP total. Elite earnings!', cost: 4500, stat: 'essenceMult', value: 0.4, icon: '💰', x: 110, y: 255, requires: ['bounty3'] },
-            { id: 'bounty5', name: 'Bounty V', desc: 'Gain 170% more SP total. Maximum profit!', cost: 11000, stat: 'essenceMult', value: 0.5, icon: '💰', x: 110, y: 320, requires: ['bounty4'] },
+            { id: 'bounty1', name: 'Bounty I', desc: 'Gain 25% more SP from all sources. Your first multiplier!', cost: 120, stat: 'essenceMult', value: 0.25, icon: '💎', x: 110, y: 60 },
+            { id: 'bounty2', name: 'Bounty II', desc: 'Gain 50% more SP total. Major income boost!', cost: 350, stat: 'essenceMult', value: 0.25, icon: '💎', x: 110, y: 125, requires: ['bounty1'] },
+            { id: 'bounty3', name: 'Bounty III', desc: 'Gain 80% more SP total. Wealth accelerator!', cost: 900, stat: 'essenceMult', value: 0.3, icon: '💰', x: 110, y: 190, requires: ['bounty2'] },
+            { id: 'bounty4', name: 'Bounty IV', desc: 'Gain 120% more SP total. Elite earnings!', cost: 2500, stat: 'essenceMult', value: 0.4, icon: '💰', x: 110, y: 255, requires: ['bounty3'] },
+            { id: 'bounty5', name: 'Bounty V', desc: 'Gain 170% more SP total. Maximum profit!', cost: 6000, stat: 'essenceMult', value: 0.5, icon: '💰', x: 110, y: 320, requires: ['bounty4'] },
             
             // Column 3 - UTILITY (center, x: 180)
-            { id: 'regen1', name: 'Regen I', desc: 'Restore 5 HP every 5 seconds. Never die again!', cost: 500, stat: 'hpRegen', value: 5, icon: '💚', x: 180, y: 90, requires: ['bounty1'] },
-            { id: 'regen2', name: 'Regen II', desc: 'Restore 12 HP every 5 seconds. Fast healing!', cost: 2500, stat: 'hpRegen', value: 7, icon: '💚', x: 180, y: 155, requires: ['regen1'] },
-            { id: 'plots1', name: 'Plots I', desc: 'Unlock +4 farm plots. More planting space!', cost: 800, stat: 'extraPlots', value: 4, icon: '🏡', x: 180, y: 220, requires: ['growth2'] },
-            { id: 'plots2', name: 'Plots II', desc: 'Unlock +4 more farm plots. Massive farm!', cost: 4000, stat: 'extraPlots', value: 4, icon: '🏡', x: 180, y: 285, requires: ['plots1'] },
-            { id: 'fisher', name: 'Fisher', desc: 'Gain 50% more SP from fishing. Oceanborn!', cost: 5000, stat: 'fishLuck', value: 0.5, icon: '🎣', x: 180, y: 350, requires: ['bounty3'] },
+            { id: 'regen1', name: 'Regen I', desc: 'Restore 5 HP every 5 seconds. Never die again!', cost: 300, stat: 'hpRegen', value: 5, icon: '💚', x: 180, y: 90, requires: ['bounty1'] },
+            { id: 'regen2', name: 'Regen II', desc: 'Restore 12 HP every 5 seconds. Fast healing!', cost: 1300, stat: 'hpRegen', value: 7, icon: '💚', x: 180, y: 155, requires: ['regen1'] },
+            { id: 'plots1', name: 'Plots I', desc: 'Unlock +4 farm plots. More planting space!', cost: 450, stat: 'extraPlots', value: 4, icon: '🏡', x: 180, y: 220, requires: ['growth2'] },
+            { id: 'plots2', name: 'Plots II', desc: 'Unlock +4 more farm plots. Massive farm!', cost: 2000, stat: 'extraPlots', value: 4, icon: '🏡', x: 180, y: 285, requires: ['plots1'] },
+            { id: 'fisher', name: 'Fisher', desc: 'Gain 50% more SP from fishing. Oceanborn!', cost: 2800, stat: 'fishLuck', value: 0.5, icon: '🎣', x: 180, y: 350, requires: ['bounty3'] },
             
             // Column 4 - POWER (x: 250)
-            { id: 'power1', name: 'Power I', desc: 'Deal +20 damage to enemies. Start hitting harder!', cost: 300, stat: 'baseDamage', value: 20, icon: '⚡', x: 250, y: 60 },
-            { id: 'power2', name: 'Power II', desc: 'Deal +50 damage total. Solid combat upgrade!', cost: 1000, stat: 'baseDamage', value: 30, icon: '⚡', x: 250, y: 125, requires: ['power1'] },
-            { id: 'power3', name: 'Power III', desc: 'Deal +90 damage total. Devastating strikes!', cost: 2700, stat: 'baseDamage', value: 40, icon: '⚔️', x: 250, y: 190, requires: ['power2'] },
-            { id: 'power4', name: 'Power IV', desc: 'Deal +140 damage total. Crush your foes!', cost: 6500, stat: 'baseDamage', value: 50, icon: '⚔️', x: 250, y: 255, requires: ['power3'] },
-            { id: 'power5', name: 'Power V', desc: 'Deal +200 damage total. Ultimate warrior!', cost: 14000, stat: 'baseDamage', value: 60, icon: '⚔️', x: 250, y: 320, requires: ['power4'] },
+            { id: 'power1', name: 'Power I', desc: 'Deal +20 damage to enemies. Start hitting harder!', cost: 180, stat: 'baseDamage', value: 20, icon: '⚡', x: 250, y: 60 },
+            { id: 'power2', name: 'Power II', desc: 'Deal +50 damage total. Solid combat upgrade!', cost: 550, stat: 'baseDamage', value: 30, icon: '⚡', x: 250, y: 125, requires: ['power1'] },
+            { id: 'power3', name: 'Power III', desc: 'Deal +90 damage total. Devastating strikes!', cost: 1500, stat: 'baseDamage', value: 40, icon: '⚔️', x: 250, y: 190, requires: ['power2'] },
+            { id: 'power4', name: 'Power IV', desc: 'Deal +140 damage total. Crush your foes!', cost: 3500, stat: 'baseDamage', value: 50, icon: '⚔️', x: 250, y: 255, requires: ['power3'] },
+            { id: 'power5', name: 'Power V', desc: 'Deal +200 damage total. Ultimate warrior!', cost: 7500, stat: 'baseDamage', value: 60, icon: '⚔️', x: 250, y: 320, requires: ['power4'] },
             
             // Column 5 - HP (right side, x: 320)
-            { id: 'hp1', name: 'Vitality I', desc: 'Gain +50 maximum HP. Survive longer in combat!', cost: 150, stat: 'maxHP', value: 50, icon: '❤️', x: 320, y: 60 },
-            { id: 'hp2', name: 'Vitality II', desc: 'Gain +100 max HP total. Much tankier!', cost: 550, stat: 'maxHP', value: 50, icon: '💗', x: 320, y: 125, requires: ['hp1'] },
-            { id: 'hp3', name: 'Vitality III', desc: 'Gain +200 max HP total. Serious durability!', cost: 1600, stat: 'maxHP', value: 100, icon: '💓', x: 320, y: 190, requires: ['hp2'] },
-            { id: 'hp4', name: 'Vitality IV', desc: 'Gain +350 max HP total. Nearly unkillable!', cost: 4200, stat: 'maxHP', value: 150, icon: '💝', x: 320, y: 255, requires: ['hp3'] },
-            { id: 'hp5', name: 'Vitality V', desc: 'Gain +500 max HP total. Legendary toughness!', cost: 10000, stat: 'maxHP', value: 150, icon: '💖', x: 320, y: 320, requires: ['hp4'] },
+            { id: 'hp1', name: 'Vitality I', desc: 'Gain +50 maximum HP. Survive longer in combat!', cost: 100, stat: 'maxHP', value: 50, icon: '❤️', x: 320, y: 60 },
+            { id: 'hp2', name: 'Vitality II', desc: 'Gain +100 max HP total. Much tankier!', cost: 300, stat: 'maxHP', value: 50, icon: '💗', x: 320, y: 125, requires: ['hp1'] },
+            { id: 'hp3', name: 'Vitality III', desc: 'Gain +200 max HP total. Serious durability!', cost: 900, stat: 'maxHP', value: 100, icon: '💓', x: 320, y: 190, requires: ['hp2'] },
+            { id: 'hp4', name: 'Vitality IV', desc: 'Gain +350 max HP total. Nearly unkillable!', cost: 2500, stat: 'maxHP', value: 150, icon: '💝', x: 320, y: 255, requires: ['hp3'] },
+            { id: 'hp5', name: 'Vitality V', desc: 'Gain +500 max HP total. Legendary toughness!', cost: 6000, stat: 'maxHP', value: 150, icon: '💖', x: 320, y: 320, requires: ['hp4'] },
             
             // Ultimate at top center
-            { id: 'master', name: 'Mastery', desc: 'Ultimate power! +100% to ALL stats. Requires all tier 5 skills.', cost: 50000, stat: 'all', value: 1, icon: '⭐', x: 180, y: 20, requires: ['growth5', 'bounty5', 'power5', 'hp5'] },
+            { id: 'master', name: 'Mastery', desc: 'Ultimate power! +100% to ALL stats. Requires all tier 5 skills.', cost: 30000, stat: 'all', value: 1, icon: '⭐', x: 180, y: 20, requires: ['growth5', 'bounty5', 'power5', 'hp5'] },
         ];
         
         const ACHIEVEMENTS = [
             { id: 'first_harvest', name: 'First Steps', desc: 'Harvest your first plant', icon: '🌱', reward: 20, check: g => g.stats.totalHarvests >= 1 },
-            { id: 'budding_farmer', name: 'Budding Farmer', desc: 'Harvest 10 plants', icon: '🌾', reward: 50, check: g => g.stats.totalHarvests >= 10 },
-            { id: 'skilled_farmer', name: 'Skilled Farmer', desc: 'Harvest 50 plants', icon: '🌿', reward: 150, check: g => g.stats.totalHarvests >= 50 },
-            { id: 'master_farmer', name: 'Master Farmer', desc: 'Harvest 100 plants', icon: '🌳', reward: 300, check: g => g.stats.totalHarvests >= 100 },
-            { id: 'harvest_legend', name: 'Harvest Legend', desc: 'Harvest 500 plants', icon: '👑', reward: 1500, check: g => g.stats.totalHarvests >= 500 },
-            { id: 'first_ore', name: 'First Strike', desc: 'Mine 10 rocks', icon: '⛏️', reward: 80, check: g => g.stats.totalRocksMined >= 10 },
-            { id: 'dedicated_miner', name: 'Dedicated Miner', desc: 'Mine 50 rocks', icon: '💎', reward: 200, check: g => g.stats.totalRocksMined >= 50 },
-            { id: 'mining_expert', name: 'Mining Expert', desc: 'Mine 200 rocks', icon: '💍', reward: 800, check: g => g.stats.totalRocksMined >= 200 },
-            { id: 'troll_slayer', name: 'Troll Slayer', desc: 'Defeat 10 trolls', icon: '⚔️', reward: 150, check: g => g.stats.totalTrollsKilled >= 10 },
-            { id: 'troll_hunter', name: 'Troll Hunter', desc: 'Defeat 25 trolls', icon: '🗡️', reward: 400, check: g => g.stats.totalTrollsKilled >= 25 },
-            { id: 'troll_bane', name: 'Troll Bane', desc: 'Defeat 100 trolls', icon: '🏹', reward: 2000, check: g => g.stats.totalTrollsKilled >= 100 },
-            { id: 'first_catch', name: 'First Catch', desc: 'Catch 25 fish', icon: '🎣', reward: 300, check: g => g.stats.fishCaught >= 25 },
-            { id: 'skilled_angler', name: 'Skilled Angler', desc: 'Catch 100 fish', icon: '🐟', reward: 1000, check: g => g.stats.fishCaught >= 100 },
-            { id: 'fishing_legend', name: 'Fishing Legend', desc: 'Catch 500 fish', icon: '🐋', reward: 5000, check: g => g.stats.fishCaught >= 500 },
-            { id: 'dragon_friend', name: 'Dragon Friend', desc: 'Feed the dragon 10 fish', icon: '🐉', reward: 500, check: g => g.stats.fishFedToDragon >= 10 },
-            { id: 'dragon_master', name: 'Dragon Master', desc: 'Feed the dragon 50 fish', icon: '🐉', reward: 2500, check: g => g.stats.fishFedToDragon >= 50 },
-            { id: 'apprentice', name: 'Apprentice', desc: 'Reach level 5', icon: '🧙‍♂️', reward: 100, check: g => g.level >= 5 },
-            { id: 'skilled_wizard', name: 'Skilled Wizard', desc: 'Reach level 15', icon: '🧙', reward: 500, check: g => g.level >= 15 },
-            { id: 'archmage', name: 'Archmage', desc: 'Reach level 30', icon: '🔮', reward: 3000, check: g => g.level >= 30 },
-            { id: 'sp_collector', name: 'SP Collector', desc: 'Earn 10,000 total SP', icon: '💰', reward: 500, check: g => g.stats.totalEssenceEarned >= 10000 },
-            { id: 'sp_hoarder', name: 'SP Hoarder', desc: 'Earn 50,000 total SP', icon: '💎', reward: 2500, check: g => g.stats.totalEssenceEarned >= 50000 },
-            { id: 'sp_emperor', name: 'SP Emperor', desc: 'Earn 200,000 total SP', icon: '👑', reward: 10000, check: g => g.stats.totalEssenceEarned >= 200000 },
+            { id: 'budding_farmer', name: 'Budding Farmer', desc: 'Harvest 10 plants', icon: '🌾', reward: 60, check: g => g.stats.totalHarvests >= 10 },
+            { id: 'skilled_farmer', name: 'Skilled Farmer', desc: 'Harvest 30 plants', icon: '🌿', reward: 140, check: g => g.stats.totalHarvests >= 30 },
+            { id: 'master_farmer', name: 'Master Farmer', desc: 'Harvest 80 plants', icon: '🌳', reward: 300, check: g => g.stats.totalHarvests >= 80 },
+            { id: 'harvest_legend', name: 'Harvest Legend', desc: 'Harvest 200 plants', icon: '👑', reward: 1200, check: g => g.stats.totalHarvests >= 200 },
+            { id: 'first_ore', name: 'First Strike', desc: 'Mine 5 rocks', icon: '⛏️', reward: 80, check: g => g.stats.totalRocksMined >= 5 },
+            { id: 'dedicated_miner', name: 'Dedicated Miner', desc: 'Mine 20 rocks', icon: '💎', reward: 220, check: g => g.stats.totalRocksMined >= 20 },
+            { id: 'mining_expert', name: 'Mining Expert', desc: 'Mine 75 rocks', icon: '💍', reward: 800, check: g => g.stats.totalRocksMined >= 75 },
+            { id: 'troll_slayer', name: 'Troll Slayer', desc: 'Defeat 5 trolls', icon: '⚔️', reward: 160, check: g => g.stats.totalTrollsKilled >= 5 },
+            { id: 'troll_hunter', name: 'Troll Hunter', desc: 'Defeat 15 trolls', icon: '🗡️', reward: 420, check: g => g.stats.totalTrollsKilled >= 15 },
+            { id: 'troll_bane', name: 'Troll Bane', desc: 'Defeat 50 trolls', icon: '🏹', reward: 1800, check: g => g.stats.totalTrollsKilled >= 50 },
+            { id: 'first_catch', name: 'First Catch', desc: 'Catch 10 fish', icon: '🎣', reward: 300, check: g => g.stats.fishCaught >= 10 },
+            { id: 'skilled_angler', name: 'Skilled Angler', desc: 'Catch 50 fish', icon: '🐟', reward: 900, check: g => g.stats.fishCaught >= 50 },
+            { id: 'fishing_legend', name: 'Fishing Legend', desc: 'Catch 200 fish', icon: '🐋', reward: 3500, check: g => g.stats.fishCaught >= 200 },
+            { id: 'dragon_friend', name: 'Dragon Friend', desc: 'Feed the dragon 5 fish', icon: '🐉', reward: 400, check: g => g.stats.fishFedToDragon >= 5 },
+            { id: 'dragon_master', name: 'Dragon Master', desc: 'Feed the dragon 20 fish', icon: '🐉', reward: 2000, check: g => g.stats.fishFedToDragon >= 20 },
+            { id: 'apprentice', name: 'Apprentice', desc: 'Reach level 5', icon: '🧙‍♂️', reward: 120, check: g => g.level >= 5 },
+            { id: 'skilled_wizard', name: 'Skilled Wizard', desc: 'Reach level 12', icon: '🧙', reward: 500, check: g => g.level >= 12 },
+            { id: 'archmage', name: 'Archmage', desc: 'Reach level 25', icon: '🔮', reward: 2500, check: g => g.level >= 25 },
+            { id: 'sp_collector', name: 'SP Collector', desc: 'Earn 5,000 total SP', icon: '💰', reward: 450, check: g => g.stats.totalEssenceEarned >= 5000 },
+            { id: 'sp_hoarder', name: 'SP Hoarder', desc: 'Earn 25,000 total SP', icon: '💎', reward: 2000, check: g => g.stats.totalEssenceEarned >= 25000 },
+            { id: 'sp_emperor', name: 'SP Emperor', desc: 'Earn 100,000 total SP', icon: '👑', reward: 8000, check: g => g.stats.totalEssenceEarned >= 100000 },
             { id: 'true_master', name: 'True Master', desc: 'Purchase Arcane Mastery', icon: '⭐', reward: 10000, check: g => g.purchasedSkills.includes('master') },
         ];
 
         const game = {
+            deviceId: null,
+            cloudSaveTimer: null,
             essence: 0, hp: 100, maxHP: 100, level: 1, xp: 0, xpNeeded: 100,
             plantSpeed: 0, baseDamage: 0, hpRegen: 0, essenceMult: 0, extraPlots: 0, fishLuck: 0,
             currentArea: 'farm', isDayTime: true, purchasedSkills: [], fishInventory: 0,
@@ -589,7 +592,7 @@
             defaultCameraOffset: { x: 0, y: 28, z: 15 },
             isDraggingCamera: false,
             previousPointerPosition: { x: 0, y: 0 },
-            panSpeed: 0.05,
+            panSpeed: 0.035,
             maxPanX: 25,
             maxPanZ: 25,
             isRecentering: false,
@@ -599,7 +602,9 @@
             touchDistance: 0,
 
             init() {
-                this.loadGame();
+                this.deviceId = this.getOrCreateDeviceId();
+                const localSavedAt = this.loadGame();
+                this.loadCloudSave(localSavedAt);
                 
                 // Ensure player always starts with seeds if they have none
                 if (Object.keys(this.seeds).length === 0 || !this.seeds[1]) {
@@ -607,6 +612,7 @@
                 }
                 
                 this.setupThreeJS();
+                document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
                 this.createWorld();
                 this.createWizard();
                 this.renderToolbar();
@@ -634,10 +640,11 @@
                         extraPlots: this.extraPlots, fishLuck: this.fishLuck, currentArea: this.currentArea, isDayTime: this.isDayTime,
                         purchasedSkills: this.purchasedSkills, seeds: this.seeds, unlockedAreas: this.unlockedAreas,
                         stats: this.stats, completedAchievements: this.completedAchievements, fishInventory: this.fishInventory,
-                        shownFirstFishNotif: this.shownFirstFishNotif, version: '1.1'
+                        shownFirstFishNotif: this.shownFirstFishNotif, version: SAVE_VERSION, savedAt: Date.now()
                     };
                     localStorage.setItem('casterValleySave', JSON.stringify(saveData));
                     this.lastSave = Date.now();
+                    this.queueCloudSave(saveData);
                 } catch (e) {
                     console.error('Save failed:', e);
                 }
@@ -648,30 +655,83 @@
                     const saved = localStorage.getItem('casterValleySave');
                     if (saved) {
                         const d = JSON.parse(saved);
-                        if (d.version === '1.1' || d.version === '1.0') {
-                            this.essence = d.essence || 0; this.hp = d.hp || 100; this.maxHP = d.maxHP || 100;
-                            this.level = d.level || 1; this.xp = d.xp || 0; this.xpNeeded = d.xpNeeded || 100;
-                            this.plantSpeed = d.plantSpeed || 0; this.baseDamage = d.baseDamage || 0;
-                            this.hpRegen = d.hpRegen || 0; this.essenceMult = d.essenceMult || 0;
-                            this.extraPlots = d.extraPlots || 0; this.fishLuck = d.fishLuck || 0;
-                            this.currentArea = d.currentArea || 'farm'; this.isDayTime = d.isDayTime !== undefined ? d.isDayTime : true;
-                            this.purchasedSkills = d.purchasedSkills || []; 
-                            this.seeds = d.seeds || { 1: 5 };
-                            // Make absolutely sure seeds has at least tier 1
-                            if (!this.seeds[1] || this.seeds[1] <= 0) {
-                                this.seeds[1] = 5;
-                            }
-                            this.unlockedAreas = d.unlockedAreas || { farm: true, mine: false, forest: false, fishing: false, astral: false };
-                            this.stats = d.stats || { totalHarvests: 0, totalRocksMined: 0, totalTrollsKilled: 0, fishCaught: 0, totalEssenceEarned: 0, deathCount: 0, playtime: 0, saturnsBurst: 0, fishFedToDragon: 0 };
-                            this.completedAchievements = d.completedAchievements || [];
-                            this.fishInventory = d.fishInventory || 0;
-                            this.shownFirstFishNotif = d.shownFirstFishNotif || false;
-                            console.log('✅ Game loaded!');
-                        }
+                        this.applySaveData(d);
+                        console.log('✅ Game loaded!');
+                        return d.savedAt || 0;
                     }
                 } catch (e) {
                     console.error('Load failed:', e);
                 }
+                return 0;
+            },
+
+            applySaveData(d) {
+                this.essence = d.essence || 0; this.hp = d.hp || 100; this.maxHP = d.maxHP || 100;
+                this.level = d.level || 1; this.xp = d.xp || 0; this.xpNeeded = d.xpNeeded || 100;
+                this.plantSpeed = d.plantSpeed || 0; this.baseDamage = d.baseDamage || 0;
+                this.hpRegen = d.hpRegen || 0; this.essenceMult = d.essenceMult || 0;
+                this.extraPlots = d.extraPlots || 0; this.fishLuck = d.fishLuck || 0;
+                this.currentArea = d.currentArea || 'farm'; this.isDayTime = d.isDayTime !== undefined ? d.isDayTime : true;
+                this.purchasedSkills = d.purchasedSkills || [];
+                this.seeds = d.seeds || { 1: 5 };
+                if (!this.seeds[1] || this.seeds[1] <= 0) this.seeds[1] = 5;
+                this.unlockedAreas = d.unlockedAreas || { farm: true, mine: false, forest: false, fishing: false, astral: false };
+                this.stats = d.stats || { totalHarvests: 0, totalRocksMined: 0, totalTrollsKilled: 0, fishCaught: 0, totalEssenceEarned: 0, deathCount: 0, playtime: 0, saturnsBurst: 0, fishFedToDragon: 0 };
+                this.completedAchievements = d.completedAchievements || [];
+                this.fishInventory = d.fishInventory || 0;
+                this.shownFirstFishNotif = d.shownFirstFishNotif || false;
+            },
+
+            getOrCreateDeviceId() {
+                try {
+                    const key = 'casterValleyDeviceId';
+                    const existing = localStorage.getItem(key);
+                    if (existing) return existing;
+                    const id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'cv-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+                    localStorage.setItem(key, id);
+                    return id;
+                } catch (_) {
+                    return 'cv-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+                }
+            },
+
+            async loadCloudSave(localSavedAt = 0) {
+                try {
+                    if (!this.deviceId) return;
+                    const resp = await fetch(`/api/caster-valley-save?deviceId=${encodeURIComponent(this.deviceId)}`);
+                    if (!resp.ok) return;
+                    const data = await resp.json();
+                    const cloud = data?.save;
+                    if (!cloud || !cloud.savedAt) return;
+                    if (cloud.savedAt > (localSavedAt || 0)) {
+                        this.applySaveData(cloud);
+                        localStorage.setItem('casterValleySave', JSON.stringify(cloud));
+                        this.lastSave = Date.now();
+                        this.updateUI();
+                        this.renderToolbar();
+                        this.renderStore();
+                    }
+                } catch (e) {
+                    console.warn('Cloud load failed:', e.message);
+                }
+            },
+
+            queueCloudSave(saveData) {
+                try {
+                    if (!this.deviceId || !navigator.onLine) return;
+                    if (this.cloudSaveTimer) clearTimeout(this.cloudSaveTimer);
+                    this.cloudSaveTimer = setTimeout(async () => {
+                        try {
+                            await fetch('/api/caster-valley-save', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ deviceId: this.deviceId, save: saveData })
+                            });
+                        } catch (e) {
+                            console.warn('Cloud save failed:', e.message);
+                        }
+                    }, 1500);
+                } catch (_) {}
             },
 
             updateDayNightVisuals() {
@@ -706,8 +766,8 @@
             showWeatherNotification() {
                 const messages = {
                     clear: '☁️ Clear Weather\nNormal farming speed',
-                    rain: '🌧️ Rain!\n+20% plant growth speed',
-                    snow: '❄️ Snow!\n-30% plant growth speed'
+                    rain: '🌧️ Rain!\n+25% plant growth speed',
+                    snow: '❄️ Snow!\n-15% plant growth speed'
                 };
                 const notif = document.createElement('div');
                 notif.className = 'weather-notification';
@@ -800,6 +860,7 @@
                     this.camera.updateProjectionMatrix();
                     this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
                 });
+                document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
                 
                 // Camera pan event listeners
                 this.setupCameraControls();
@@ -824,8 +885,8 @@
                         // Intuitive map-style dragging - map follows your cursor
                         // Drag right = camera pans left (see more to the right)
                         // Drag down = camera pans up (see more below)
-                        this.cameraTarget.x += deltaX * this.panSpeed;
-                        this.cameraTarget.z += deltaY * this.panSpeed;
+                        this.cameraTarget.x -= deltaX * this.panSpeed;
+                        this.cameraTarget.z -= deltaY * this.panSpeed;
                         
                         // Clamp camera position
                         this.cameraTarget.x = Math.max(-this.maxPanX, Math.min(this.maxPanX, this.cameraTarget.x));
@@ -860,8 +921,8 @@
                         const deltaY = e.touches[0].clientY - this.previousPointerPosition.y;
                         
                         // Intuitive map-style dragging - map follows your finger
-                        this.cameraTarget.x += deltaX * this.panSpeed;
-                        this.cameraTarget.z += deltaY * this.panSpeed;
+                        this.cameraTarget.x -= deltaX * this.panSpeed;
+                        this.cameraTarget.z -= deltaY * this.panSpeed;
                         
                         // Clamp camera position
                         this.cameraTarget.x = Math.max(-this.maxPanX, Math.min(this.maxPanX, this.cameraTarget.x));
@@ -1061,8 +1122,8 @@
                 for (let i = 0; i < total; i++) {
                     const col = i % 4;
                     const row = Math.floor(i / 4);
-                    const x = (col - 1.5) * 3.5; // Increased from 2.5 to 3.5
-                    const z = (row - Math.floor(total / 4) / 2) * 3.5; // Increased from 2.5 to 3.5
+                    const x = (col - 1.5) * 4.2; // Wider spacing
+                    const z = (row - Math.floor(total / 4) / 2) * 4.2; // Wider spacing
                     
                     const plot = new THREE.Mesh(new THREE.BoxGeometry(2, 0.3, 2), new THREE.MeshLambertMaterial({ color: 0x6d5633 }));
                     plot.position.set(x, 0.15, z);
@@ -1384,9 +1445,9 @@
                         })
                     );
                     patch.position.set(
-                        (Math.random() - 0.5) * 28,
+                        (Math.random() - 0.5) * 40,
                         0.02,
-                        (Math.random() - 0.5) * 28
+                        (Math.random() - 0.5) * 40
                     );
                     patch.rotation.x = -Math.PI / 2;
                     this.scene.add(patch);
@@ -1400,9 +1461,9 @@
                         new THREE.MeshLambertMaterial({ color: 0x808080, transparent: true, opacity: 0.7 })
                     );
                     pebble.position.set(
-                        (Math.random() - 0.5) * 25,
+                        (Math.random() - 0.5) * 38,
                         0.02,
-                        (Math.random() - 0.5) * 25
+                        (Math.random() - 0.5) * 38
                     );
                     pebble.rotation.x = -Math.PI / 2;
                     this.scene.add(pebble);
@@ -1418,8 +1479,8 @@
                     const nextAngle = ((i + 1) / 30) * Math.PI * 2;
                     
                     // Vary distance for organic feel
-                    const distance = 26 + Math.sin(i * 0.5) * 4 + (Math.random() - 0.5) * 2;
-                    const nextDistance = 26 + Math.sin((i + 1) * 0.5) * 4 + (Math.random() - 0.5) * 2;
+                    const distance = 36 + Math.sin(i * 0.5) * 5 + (Math.random() - 0.5) * 2;
+                    const nextDistance = 36 + Math.sin((i + 1) * 0.5) * 5 + (Math.random() - 0.5) * 2;
                     
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
@@ -1466,19 +1527,21 @@
                 }
                 
                 // Water stream flowing through cave
-                for (let i = 0; i < 20; i++) {
+                for (let i = 0; i < 28; i++) {
                     const streamSegment = new THREE.Mesh(
-                        new THREE.PlaneGeometry(1.5, 2),
-                        new THREE.MeshLambertMaterial({ 
+                        new THREE.PlaneGeometry(2.5, 3),
+                        new THREE.MeshPhongMaterial({ 
                             color: 0x4a90e2,
+                            shininess: 80,
+                            specular: 0x9fd5ff,
                             transparent: true,
-                            opacity: 0.6
+                            opacity: 0.7
                         })
                     );
                     streamSegment.position.set(
-                        -10 + i * 1,
+                        -18 + i * 1.6,
                         0.05,
-                        -8 + Math.sin(i * 0.5) * 2
+                        -12 + Math.sin(i * 0.4) * 4
                     );
                     streamSegment.rotation.x = -Math.PI / 2;
                     this.scene.add(streamSegment);
@@ -1491,9 +1554,9 @@
                 for (let i = 0; i < 40; i++) {
                     const stalactite = new THREE.Mesh(stalactiteGeo, stalactiteMat);
                     stalactite.position.set(
-                        (Math.random() - 0.5) * 40,
+                        (Math.random() - 0.5) * 55,
                         9 + Math.random() * 2,
-                        (Math.random() - 0.5) * 40
+                        (Math.random() - 0.5) * 55
                     );
                     stalactite.rotation.x = Math.PI;
                     stalactite.scale.set(1, 0.8 + Math.random() * 0.6, 1);
@@ -1507,9 +1570,9 @@
                 for (let i = 0; i < 35; i++) {
                     const stalagmite = new THREE.Mesh(stalagmiteGeo, stalagmiteMat);
                     stalagmite.position.set(
-                        (Math.random() - 0.5) * 45,
+                        (Math.random() - 0.5) * 55,
                         1.25,
-                        (Math.random() - 0.5) * 45
+                        (Math.random() - 0.5) * 55
                     );
                     stalagmite.scale.set(1, 0.7 + Math.random() * 0.8, 1);
                     stalagmite.castShadow = true;
@@ -1519,8 +1582,8 @@
                 
                 // Column formations where stalactites/stalagmites meet
                 for (let i = 0; i < 8; i++) {
-                    const x = (Math.random() - 0.5) * 35;
-                    const z = (Math.random() - 0.5) * 35;
+                    const x = (Math.random() - 0.5) * 50;
+                    const z = (Math.random() - 0.5) * 50;
                     const column = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.4, 0.45, 10, 8),
                         new THREE.MeshLambertMaterial({ color: 0x6a6a6a })
@@ -1617,14 +1680,14 @@
                     // Random position with minimum distance from other rocks
                     let x, z, tooClose;
                     do {
-                        x = (Math.random() - 0.5) * 20; // -10 to 10
-                        z = (Math.random() - 0.5) * 20; // -10 to 10
+                        x = (Math.random() - 0.5) * 30; // -15 to 15
+                        z = (Math.random() - 0.5) * 30; // -15 to 15
                         
                         // Check distance from existing rocks
                         tooClose = false;
                         for (const pos of rockPositions) {
                             const dist = Math.sqrt((x - pos.x) ** 2 + (z - pos.z) ** 2);
-                            if (dist < 5) { // Min 5 units apart
+                            if (dist < 7) { // Min 7 units apart
                                 tooClose = true;
                                 break;
                             }
@@ -2004,16 +2067,16 @@
                     leftWing, 
                     rightWing,
                     tail,
-                    headBaseX: -0.4,
+                    headBaseX: 0,
                     headBaseY: 6.0,
-                    headBaseZ: -7.5,
+                    headBaseZ: -7.4,
                     headTime: 0, // For head animation
                     isFlying: false,
                     flyTime: 0,
-                    flyRadius: 12,
-                    flyHeight: 8,
-                    baseX: -0.4,
-                    baseZ: -7.5
+                    flyRadius: 16,
+                    flyHeight: 10,
+                    baseX: 0,
+                    baseZ: -8
                 };
                 
                 // Trolls (randomly positioned, avoid dragon AND trees)
@@ -2187,7 +2250,7 @@
                 
                 // MUCH BIGGER irregular island (beach)
                 // Main beach circle - BIGGER
-                const beachGeo = new THREE.RingGeometry(10, 25, 48); // Was 8-18, now 10-25
+                const beachGeo = new THREE.RingGeometry(14, 32, 64); // Larger island
                 const beachMat = new THREE.MeshLambertMaterial({ color: 0xf4a460 });
                 const beach = new THREE.Mesh(beachGeo, beachMat);
                 beach.rotation.x = -Math.PI / 2;
@@ -2198,7 +2261,7 @@
                 // MANY more sand patches to make island MUCH bigger and irregular
                 for (let i = 0; i < 150; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 10 + Math.random() * 18; // Bigger spread
+                    const distance = 14 + Math.random() * 24; // Bigger spread
                     const x = Math.cos(angle) * distance + (Math.random() - 0.5) * 5;
                     const z = Math.sin(angle) * distance + (Math.random() - 0.5) * 5;
                     const sandPatch = new THREE.Mesh(
@@ -2220,13 +2283,13 @@
                 for (let i = 0; i < 6; i++) {
                     const baseAngle = (i / 6) * Math.PI * 2;
                     // Create peninsula extending outward
-                    for (let j = 0; j < 8; j++) {
-                        const distance = 16 + j * 1.5;
-                        const width = 3 - j * 0.3; // Narrows as it extends
+                    for (let j = 0; j < 9; j++) {
+                        const distance = 20 + j * 2.0;
+                        const width = 4 - j * 0.35; // Narrows as it extends
                         const x = Math.cos(baseAngle) * distance + (Math.random() - 0.5) * width;
                         const z = Math.sin(baseAngle) * distance + (Math.random() - 0.5) * width;
                         const patch = new THREE.Mesh(
-                            new THREE.CircleGeometry(0.9 + Math.random() * 0.8, 8),
+                            new THREE.CircleGeometry(1.1 + Math.random() * 1.0, 8),
                             new THREE.MeshLambertMaterial({ color: 0xf4a460, transparent: true, opacity: 0.8 })
                         );
                         patch.position.set(x, 0.09, z);
@@ -2237,10 +2300,10 @@
                 }
                 
                 // MORE palm trees spread across bigger island (25-30 trees)
-                const numPalms = 25 + Math.floor(Math.random() * 6);
+                const numPalms = 28 + Math.floor(Math.random() * 8);
                 for (let i = 0; i < numPalms; i++) {
                     const angle = (i / numPalms) * Math.PI * 2 + (Math.random() - 0.5) * 1;
-                    const distance = 13 + Math.random() * 10; // Wider spread
+                    const distance = 18 + Math.random() * 14; // Wider spread
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     
@@ -2276,7 +2339,7 @@
                 // MORE coconuts scattered across bigger island
                 for (let i = 0; i < 40; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 12 + Math.random() * 12;
+                    const distance = 16 + Math.random() * 16;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     const coconut = new THREE.Mesh(
@@ -2291,7 +2354,7 @@
                 // Add beach rocks along shoreline
                 for (let i = 0; i < 30; i++) {
                     const angle = (i / 30) * Math.PI * 2;
-                    const distance = 10 + Math.random() * 2;
+                    const distance = 14 + Math.random() * 3;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     const rock = new THREE.Mesh(
@@ -2309,11 +2372,11 @@
                     let x, z, distFromCenter;
                     do {
                         const angle = Math.random() * Math.PI * 2;
-                        const distance = 10 + Math.random() * 12; // Beach area
+                        const distance = 14 + Math.random() * 16; // Beach area
                         x = Math.cos(angle) * distance;
                         z = Math.sin(angle) * distance;
                         distFromCenter = Math.sqrt(x * x + z * z);
-                    } while (distFromCenter < 10 || distFromCenter > 22); // Only on beach/sand
+                    } while (distFromCenter < 14 || distFromCenter > 28); // Only on beach/sand
                     
                     const rock = new THREE.Mesh(
                         new THREE.DodecahedronGeometry(0.4 + Math.random() * 0.4, 0),
@@ -2327,8 +2390,8 @@
                 
                 // Floating logs across water
                 for (let i = 0; i < 15; i++) {
-                    const x = (Math.random() - 0.5) * 28;
-                    const z = (Math.random() - 0.5) * 28;
+                    const x = (Math.random() - 0.5) * 40;
+                    const z = (Math.random() - 0.5) * 40;
                     const log = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.2, 0.2, 2 + Math.random(), 8),
                         new THREE.MeshLambertMaterial({ color: 0x4a2511 })
@@ -2343,7 +2406,7 @@
                 // 30 Seaweed plants
                 for (let i = 0; i < 30; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 3 + Math.random() * 5;
+                    const distance = 5 + Math.random() * 8;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     
@@ -2361,14 +2424,14 @@
                     new THREE.BoxGeometry(6, 0.3, 2),
                     new THREE.MeshLambertMaterial({ color: 0x8b4513 })
                 );
-                dockBase.position.set(0, 0.3, -10);
+                dockBase.position.set(0, 0.3, -14);
                 this.scene.add(dockBase);
                 this.areaObjects.push(dockBase);
                 
                 // Dock posts
                 const postGeo = new THREE.CylinderGeometry(0.15, 0.15, 1.2, 8);
                 const postMat = new THREE.MeshLambertMaterial({ color: 0x654321 });
-                [[-2.5, -9], [2.5, -9], [-2.5, -11], [2.5, -11]].forEach(([x, z]) => {
+                [[-2.5, -13], [2.5, -13], [-2.5, -15], [2.5, -15]].forEach(([x, z]) => {
                     const post = new THREE.Mesh(postGeo, postMat);
                     post.position.set(x, 0.6, z);
                     this.scene.add(post);
@@ -2380,7 +2443,7 @@
                     new THREE.CylinderGeometry(0.5, 0.6, 1.4, 8),
                     new THREE.MeshLambertMaterial({ color: 0xf97316 })
                 );
-                fishingWizBody.position.set(0, 1.15, -10);
+                fishingWizBody.position.set(0, 1.15, -14);
                 fishingWizBody.castShadow = true;
                 this.scene.add(fishingWizBody);
                 this.areaObjects.push(fishingWizBody);
@@ -2389,7 +2452,7 @@
                     new THREE.SphereGeometry(0.35, 16, 16),
                     new THREE.MeshBasicMaterial({ color: 0x000000 })
                 );
-                fishingWizFace.position.set(0, 1.95, -9.9);
+                fishingWizFace.position.set(0, 1.95, -13.9);
                 this.scene.add(fishingWizFace);
                 this.areaObjects.push(fishingWizFace);
                 
@@ -2397,7 +2460,7 @@
                     new THREE.SphereGeometry(0.08, 8, 8),
                     new THREE.MeshBasicMaterial({ color: 0xffeb3b })
                 );
-                fishingWizLeftEye.position.set(0.15, 1.97, -9.62);
+                fishingWizLeftEye.position.set(0.15, 1.97, -13.62);
                 this.scene.add(fishingWizLeftEye);
                 this.areaObjects.push(fishingWizLeftEye);
                 
@@ -2405,7 +2468,7 @@
                     new THREE.SphereGeometry(0.08, 8, 8),
                     new THREE.MeshBasicMaterial({ color: 0xffeb3b })
                 );
-                fishingWizRightEye.position.set(-0.15, 1.97, -9.62);
+                fishingWizRightEye.position.set(-0.15, 1.97, -13.62);
                 this.scene.add(fishingWizRightEye);
                 this.areaObjects.push(fishingWizRightEye);
                 
@@ -2413,7 +2476,7 @@
                     new THREE.ConeGeometry(0.4, 1.2, 16),
                     new THREE.MeshLambertMaterial({ color: 0xf97316 })
                 );
-                fishingWizHat.position.set(0, 2.85, -10);
+                fishingWizHat.position.set(0, 2.85, -14);
                 fishingWizHat.castShadow = true;
                 this.scene.add(fishingWizHat);
                 this.areaObjects.push(fishingWizHat);
@@ -2423,7 +2486,7 @@
                     new THREE.CylinderGeometry(0.03, 0.03, 2.2, 8),
                     new THREE.MeshLambertMaterial({ color: 0x654321 })
                 );
-                fishingRod.position.set(0.6, 1.3, -10);
+                fishingRod.position.set(0.6, 1.3, -14);
                 fishingRod.rotation.z = -Math.PI / 3;
                 fishingRod.castShadow = true;
                 this.scene.add(fishingRod);
@@ -2443,8 +2506,8 @@
                 
                 // Spawn fish in water only (inside radius 9 circle)
                 const side = Math.random() < 0.5 ? -1 : 1;
-                const x = side * 8;
-                const z = (Math.random() - 0.5) * 8;
+                const x = side * 12;
+                const z = (Math.random() - 0.5) * 12;
                 
                 // Create fish group
                 const fishGroup = new THREE.Group();
@@ -2719,17 +2782,17 @@
                 // Boundary check for fishing area - keep wizard on brown sandy beach ONLY
                 if (this.currentArea === 'fishing') {
                     const distFromCenter = Math.sqrt(targetX * targetX + targetZ * targetZ);
-                    // Beach is radius 10-15 (brown sand ring), water inside radius 10
-                    if (distFromCenter < 10) {
+                    // Beach is radius 14-26 (brown sand ring), water inside radius 14
+                    if (distFromCenter < 14) {
                         // In water! Push to inner edge of beach
                         const angle = Math.atan2(targetZ, targetX);
-                        targetX = Math.cos(angle) * 10.5; // Inner beach edge
-                        targetZ = Math.sin(angle) * 10.5;
-                    } else if (distFromCenter > 15) {
+                        targetX = Math.cos(angle) * 14.5; // Inner beach edge
+                        targetZ = Math.sin(angle) * 14.5;
+                    } else if (distFromCenter > 26) {
                         // Beyond beach! Pull back to outer edge
                         const angle = Math.atan2(targetZ, targetX);
-                        targetX = Math.cos(angle) * 14.5; // Outer beach edge
-                        targetZ = Math.sin(angle) * 14.5;
+                        targetX = Math.cos(angle) * 25.5; // Outer beach edge
+                        targetZ = Math.sin(angle) * 25.5;
                     }
                 }
                 
@@ -2899,6 +2962,13 @@
                 // Create unique plant for each tier
                 const plantGroup = new THREE.Group();
                 const color = SEED_TIERS[tier - 1].color;
+                const stem = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.05, 0.07, 0.45, 6),
+                    new THREE.MeshLambertMaterial({ color: 0x4a7c3a })
+                );
+                stem.position.y = 0.23;
+                plantGroup.add(stem);
+                plantGroup.userData = { tier, swayPhase: Math.random() * Math.PI * 2 };
                 
                 if (tier === 1) {
                     // Tier 1: Small round bush
@@ -2911,13 +2981,6 @@
                     plantGroup.add(bush);
                 } else if (tier === 2) {
                     // Tier 2: Flower with petals
-                    const stem = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.05, 0.07, 0.4, 6),
-                        new THREE.MeshLambertMaterial({ color: 0x4a7c3a })
-                    );
-                    stem.position.y = 0.2;
-                    plantGroup.add(stem);
-                    
                     const center = new THREE.Mesh(
                         new THREE.SphereGeometry(0.12, 8, 8),
                         new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.5 })
@@ -3121,8 +3184,8 @@
                     }
                 }
                 
-                plantGroup.position.set(plot.x, 0.5, plot.z);
-                plantGroup.scale.set(0.6, 0.6, 0.6); // Start visible (was 0.4)
+                plantGroup.position.set(plot.x, 0.6, plot.z);
+                plantGroup.scale.set(0.8, 0.8, 0.8); // Start visible
                 plantGroup.castShadow = true;
                 this.scene.add(plantGroup);
                 this.areaObjects.push(plantGroup);
@@ -3138,7 +3201,7 @@
                 this.essence += gain;
                 this.stats.totalEssenceEarned += gain;
                 this.stats.totalHarvests++;
-                this.xp += tier * 4;
+                this.xp += tier * 6;
                 this.checkLevel();
                 this.seeds[tier] = (this.seeds[tier] || 0) + 1;
                 if (tier < 10) this.seeds[tier + 1] = (this.seeds[tier + 1] || 0) + 1;
@@ -3173,7 +3236,7 @@
                     this.essence += gain;
                     this.stats.totalEssenceEarned += gain;
                     this.stats.totalRocksMined++;
-                    this.xp += 5;
+                    this.xp += 8;
                     this.checkLevel();
                     this.checkAchievements();
                     this.updateUI();
@@ -3183,8 +3246,8 @@
                     rock.hpBarFill.visible = false;
                     setTimeout(() => {
                         // Randomize respawn position
-                        const newX = (Math.random() - 0.5) * 20;
-                        const newZ = (Math.random() - 0.5) * 20;
+                        const newX = (Math.random() - 0.5) * 30;
+                        const newZ = (Math.random() - 0.5) * 30;
                         rock.x = newX;
                         rock.z = newZ;
                         rock.mesh.position.set(newX, 0.8, newZ);
@@ -3221,7 +3284,7 @@
                     this.essence += gain;
                     this.stats.totalEssenceEarned += gain;
                     this.stats.totalTrollsKilled++;
-                    this.xp += 30;
+                    this.xp += 40;
                     this.checkLevel();
                     const randTier = Math.min(10, Math.max(2, Math.floor(this.level / 2) + Math.floor(Math.random() * 4)));
                     this.seeds[randTier] = (this.seeds[randTier] || 0) + 1;
@@ -3296,7 +3359,7 @@
                 
                 // Create fishing line from dock wizard (at 0, 1.95, -10) to fish
                 const lineGeometry = new THREE.BufferGeometry();
-                const wizardPos = new THREE.Vector3(0, 1.95, -10);
+                const wizardPos = new THREE.Vector3(0, 1.95, -14);
                 const fishPos = new THREE.Vector3(fish.x, 0.5, fish.z);
                 lineGeometry.setFromPoints([wizardPos, fishPos]);
                 
@@ -3317,7 +3380,7 @@
                     if (idx > -1) this.areaObjects.splice(idx, 1);
                     
                     // RNG - 30% chance fish escapes!
-                    const catchChance = 0.7; // 70% success rate
+                    const catchChance = 0.8; // 80% success rate
                     if (Math.random() > catchChance) {
                         // Fish escaped!
                         fish.caught = false; // Allow it to swim away
@@ -3331,7 +3394,7 @@
                     this.essence += gain;
                     this.stats.totalEssenceEarned += gain;
                     this.stats.fishCaught++;
-                    this.xp += 50;
+                    this.xp += 60;
                     this.checkLevel();
                     
                     this.scene.remove(fish.mesh);
@@ -3367,7 +3430,7 @@
                 this.essence += gain;
                 this.stats.totalEssenceEarned += gain;
                 this.stats.saturnsBurst++;
-                this.xp += 40;
+                this.xp += 50;
                 this.checkLevel();
                 saturn.planet.visible = false;
                 saturn.ring.visible = false;
@@ -3394,7 +3457,7 @@
                 while (this.xp >= this.xpNeeded) {
                     this.xp -= this.xpNeeded;
                     this.level++;
-                    this.xpNeeded = Math.floor(this.xpNeeded * 1.5);
+                    this.xpNeeded = Math.floor(this.xpNeeded * 1.35);
                     this.maxHP += 15;
                     this.hp = this.maxHP;
                     this.showToast(`🎉 Level ${this.level}!`);
@@ -3994,19 +4057,30 @@
                 
                 if (this.currentArea === 'farm') {
                     let speedMult = this.isDayTime ? 1.4 : 0.8;
-                    if (this.weather === 'rain') speedMult *= 1.2;
-                    if (this.weather === 'snow') speedMult *= 0.7; // Snow slows growth by 30%
+                    if (this.weather === 'rain') speedMult *= 1.25;
+                    if (this.weather === 'snow') speedMult *= 0.85; // Snow slows growth by 15%
                     this.farmPlots.forEach(plot => {
                         if (plot.seed && plot.plantMesh) {
                             plot.growthTime += 100 * speedMult * (1 + this.plantSpeed);
                             const progress = Math.min(plot.growthTime / plot.growthNeeded, 1);
                             // Bigger final size: 0.3 + progress * 1.2 → 0.4 + progress * 2.0
-                            const targetScale = 0.4 + progress * 1.2; // Grows from 0.4 to 1.6 (shorter!)
+                            const targetScale = 0.7 + progress * 1.6; // Grows from 0.7 to 2.3
                             // Smooth scale interpolation
                             const currentScale = plot.plantMesh.scale.x;
                             const newScale = currentScale + (targetScale - currentScale) * 0.1;
                             plot.plantMesh.scale.set(newScale, newScale, newScale);
-                            plot.plantMesh.position.y = 0.5 + newScale * 0.4; // Higher position for bigger plants
+                            plot.plantMesh.position.y = 0.6 + newScale * 0.45; // Higher position for bigger plants
+                            const tier = plot.plantMesh.userData?.tier || 1;
+                            const phase = plot.plantMesh.userData?.swayPhase || 0;
+                            plot.plantMesh.rotation.z = Math.sin(Date.now() / 500 + phase) * 0.08;
+                            plot.plantMesh.rotation.x = Math.sin(Date.now() / 700 + phase) * 0.04;
+                            if (tier === 3 || tier === 7) {
+                                plot.plantMesh.rotation.y += 0.01;
+                            } else if (tier === 4 || tier === 9) {
+                                plot.plantMesh.position.y += Math.sin(Date.now() / 600 + phase) * 0.05;
+                            } else if (tier === 6 || tier === 10) {
+                                plot.plantMesh.rotation.y += 0.02;
+                            }
                             if (progress >= 1) {
                                 plot.plantMesh.rotation.y += 0.05; // Faster rotation when ready!
                                 // Stronger glow when fully grown - update ALL children
@@ -4057,21 +4131,21 @@
                             
                             // Spawn rat thief
                             const rat = new THREE.Mesh(
-                                new THREE.SphereGeometry(0.4, 8, 8),
-                                new THREE.MeshLambertMaterial({ color: 0x4a4a4a, emissive: 0xff0000, emissiveIntensity: 0.3 })
+                                new THREE.SphereGeometry(0.5, 10, 10),
+                                new THREE.MeshLambertMaterial({ color: 0x5a5a5a, emissive: 0xff4444, emissiveIntensity: 0.7 })
                             );
-                            rat.position.set(targetPlot.x + 5, 0.4, targetPlot.z);
+                            rat.position.set(targetPlot.x + 5, 0.45, targetPlot.z);
                             this.scene.add(rat);
                             this.areaObjects.push(rat);
                             
                             // Add whiskers/ears
-                            const ear1 = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshLambertMaterial({ color: 0xff69b4 }));
-                            ear1.position.set(targetPlot.x + 5 - 0.2, 0.6, targetPlot.z + 0.1);
+                            const ear1 = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshLambertMaterial({ color: 0xff69b4 }));
+                            ear1.position.set(targetPlot.x + 5 - 0.22, 0.7, targetPlot.z + 0.1);
                             this.scene.add(ear1);
                             this.areaObjects.push(ear1);
                             
-                            const ear2 = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshLambertMaterial({ color: 0xff69b4 }));
-                            ear2.position.set(targetPlot.x + 5 + 0.2, 0.6, targetPlot.z + 0.1);
+                            const ear2 = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshLambertMaterial({ color: 0xff69b4 }));
+                            ear2.position.set(targetPlot.x + 5 + 0.22, 0.7, targetPlot.z + 0.1);
                             this.scene.add(ear2);
                             this.areaObjects.push(ear2);
                             
@@ -4152,7 +4226,7 @@
                 }
                 if (this.currentArea === 'forest') {
                     // Smooth dragon animation with head movement
-                    if (this.dragon) {
+                    if (this.dragon && !this.dragon.isFlying) {
                         const time = Date.now() / 1000;
                         
                         // Head looks around - moves in 3D space
@@ -4161,6 +4235,7 @@
                         const headY = this.dragon.headBaseY + Math.sin(time * 0.4) * 0.3; // Moves up-down
                         const headZ = this.dragon.headBaseZ + Math.sin(time * 0.35) * 0.2; // Moves forward-back
                         this.dragon.head.position.set(headX, headY, headZ);
+                        this.dragon.snout.position.set(headX, headY, headZ + 1.2);
                         
                         // Head rotation (looking around)
                         this.dragon.head.rotation.y = Math.sin(time * 0.4) * 0.4;
@@ -4175,6 +4250,14 @@
                         this.dragon.rightHorn.position.set(headX + 0.3, headY - 0.2, headZ);
                         
                         // Neck and wing animation
+                        const bodyX = this.dragon.body.position.x;
+                        const bodyY = this.dragon.body.position.y;
+                        const bodyZ = this.dragon.body.position.z;
+                        this.dragon.neck.position.set(
+                            bodyX + (headX - bodyX) * 0.4,
+                            bodyY + 3.2 + (headY - (bodyY + 3.2)) * 0.4,
+                            bodyZ + (headZ - bodyZ) * 0.35
+                        );
                         this.dragon.neck.rotation.z = 0.3 + Math.sin(time * 0.25) * 0.15;
                         this.dragon.leftWing.rotation.z = 0.5 + Math.sin(time * 0.8) * 0.25;
                         this.dragon.rightWing.rotation.z = -0.5 - Math.sin(time * 0.8) * 0.25;
@@ -4197,12 +4280,12 @@
                             const dx = fish.targetX - fish.x;
                             fish.x += dx * (fish.speed * 0.8); // Smoother movement
                             
-                            // Keep fish in water (inside radius 9)
+                            // Keep fish in water (inside radius 13)
                             const distFromCenter = Math.sqrt(fish.x * fish.x + fish.z * fish.z);
-                            if (distFromCenter > 9) {
+                            if (distFromCenter > 13) {
                                 const angle = Math.atan2(fish.z, fish.x);
-                                fish.x = Math.cos(angle) * 8.5;
-                                fish.z = Math.sin(angle) * 8.5;
+                                fish.x = Math.cos(angle) * 12.5;
+                                fish.z = Math.sin(angle) * 12.5;
                                 fish.targetX = -fish.x; // Reverse direction
                             }
                             
@@ -4343,11 +4426,29 @@
             },
 
             toggleFullscreen() {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
+                const container = document.getElementById('game-container');
+                if (!document.fullscreenElement && container) {
+                    container.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
                 } else {
                     document.exitFullscreen();
                 }
+            },
+
+            handleFullscreenChange() {
+                const isFullscreen = !!document.fullscreenElement;
+                document.body.style.overflow = isFullscreen ? 'hidden' : '';
+                document.documentElement.style.overflow = isFullscreen ? 'hidden' : '';
+                document.body.style.touchAction = isFullscreen ? 'none' : '';
+                document.documentElement.style.touchAction = isFullscreen ? 'none' : '';
+
+                const canvas = this.renderer && this.renderer.domElement;
+                if (!canvas || !this.camera || !this.renderer) return;
+
+                const width = isFullscreen ? window.innerWidth : canvas.clientWidth;
+                const height = isFullscreen ? window.innerHeight : canvas.clientHeight;
+                this.camera.aspect = width / height;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(width, height);
             },
 
             openModal(type) {
