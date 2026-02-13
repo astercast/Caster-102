@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "functions": {
+    "api/chia-cat-prices.js": {
+      "maxDuration": 60
+    },
+    "api/treasury-comprehensive.js": {
+      "maxDuration": 60
+    },
+    "api/chia-collections.js": {
+      "maxDuration": 30
+    },
+    "api/chia-address-proxy.js": {
+      "maxDuration": 45
+    },
+    "api/merkl-pools.js": {
+      "maxDuration": 15
+    },
+    "api/merkl-proxy.js": {
+      "maxDuration": 15
+    },
+    "api/spacescan-proxy.js": {
+      "maxDuration": 20
+    }
+  }
+}
