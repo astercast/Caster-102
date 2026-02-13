@@ -4067,6 +4067,9 @@ async function loadComprehensiveTreasury() {
                             let name = (t.name || t.symbol || '').trim();
                             if (!name) name = `Token ${(t.asset_id || '').slice(0,6).toUpperCase()}`;
                             
+                            // Ensure symbol has a fallback (never empty)
+                            const symbol = (t.symbol || name.slice(0,8) || (t.asset_id || '').slice(0,8) || 'CAT');
+                            
                             const isLP = name.toLowerCase().includes('tibet') || name.toLowerCase().includes(' lp ');
                             const balance = t.balance;
                             const price = t.price;
@@ -4080,7 +4083,7 @@ async function loadComprehensiveTreasury() {
                                 if (m) pairName = m[1].replace(/-/g, '/');
                             }
                             const tok = {
-                                symbol: t.symbol, name, assetId: t.asset_id,
+                                symbol, name, assetId: t.asset_id,
                                 balance, price, value,
                                 type: isLP ? 'lp' : 'cat', image: ''
                             };
