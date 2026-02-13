@@ -1047,28 +1047,28 @@
             timestamp: null
         };
         
-        // Treasury Loading Modal
+        // Treasury Loading Modal - centered, smaller, only on treasury page
         const TREASURY_MODAL_HTML = `
             <div id="treasury-loading-modal" style="
-                position: fixed; bottom: 20px; right: 20px;
+                position: fixed; top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
                 background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(10, 10, 20, 0.98));
                 border: 2px solid rgba(251, 191, 36, 0.4);
-                border-radius: 12px; padding: 16px 20px;
-                display: none; z-index: 999;
-                text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-                min-width: 200px; cursor: pointer;
-            " onclick="document.getElementById('treasury-loading-modal').style.display = 'none';">
-                <div style="font-size: 28px; margin-bottom: 8px; animation: spin 2s linear infinite;">⛓️</div>
-                <div style="font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 6px;">Treasury Loading</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 11px; margin-bottom: 8px;">
-                    30-60 seconds
+                border-radius: 16px; padding: 28px 40px;
+                display: none; z-index: 9999;
+                text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(251,191,36,0.15);
+                min-width: 280px; max-width: 320px; backdrop-filter: blur(12px);
+            " onclick="event.stopPropagation(); document.getElementById('treasury-loading-modal').style.display = 'none';">
+                <div style="font-size: 32px; margin-bottom: 12px; animation: spin 2s linear infinite;">⏳</div>
+                <div style="font-size: 16px; font-weight: 700; color: #fbbf24; margin-bottom: 8px;">Loading Treasury</div>
+                <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 12px;">
+                    Fetching wallets & prices...
                 </div>
-                <div style="display: flex; gap: 6px; justify-content: center;">
-                    <div style="width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
-                    <div style="width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite 0.3s;"></div>
-                    <div style="width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite 0.6s;"></div>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
+                    <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite 0.3s;"></div>
+                    <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite 0.6s;"></div>
                 </div>
-                <div style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 8px;">Click to dismiss</div>
                 <style>
                     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
                     @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -1674,9 +1674,10 @@
                                 height: 100%;
                                 border: none;
                             "
-                            src="https://www.youtube.com/embed/V7CTinIJrNc" 
+                            src="https://www.youtube.com/embed/V7CTinIJrNc?quality=hd" 
                             title="Awizard Tutorial" 
-                            frameborder="0" 
+                            frameborder="0"
+                            loading="lazy"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
@@ -1969,27 +1970,15 @@
                                 </a>
                             </div>
 
-                            <!-- Twitter widget: visible immediately, SDK renders into it -->
-                            <div id="tw-widget" style="min-height:460px;">
-                                <a class="twitter-timeline"
-                                   data-theme="dark"
-                                   data-tweet-limit="10"
-                                   data-chrome="noheader nofooter noborders transparent"
-                                   data-dnt="true"
-                                   data-aria-polite="assertive"
-                                   href="https://twitter.com/aWizardxch">Tweets by aWizardxch</a>
-                            </div>
-
-                            <!-- Fallback shown only if widget never loads -->
-                            <div id="tw-fallback" style="display:none;padding:28px 20px;text-align:center;">
-                                <div style="font-size:32px;margin-bottom:12px;">🧙</div>
-                                <p style="color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:16px;">Twitter widget blocked — view posts directly on X</p>
-                                <a href="https://twitter.com/aWizardxch" target="_blank"
-                                   style="display:inline-flex;align-items:center;gap:7px;background:rgba(29,161,242,0.18);border:1px solid rgba(29,161,242,0.45);border-radius:24px;padding:10px 22px;color:#1da1f2;font-size:13px;font-weight:700;text-decoration:none;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#1da1f2"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622z"/></svg>
-                                    View @aWizardxch on X
-                                </a>
-                            </div>
+                            <!-- Nitter Feed: Lightweight, no SDK dependency -->
+                            <iframe 
+                                id="tw-widget"
+                                src="https://nitter.net/aWizardxch" 
+                                width="100%" 
+                                height="600" 
+                                frameborder="0"
+                                style="border-radius:12px;border:1px solid rgba(29,161,242,0.15);background:rgba(5,10,20,0.8);">
+                            </iframe>
 
                         </div>
                     </div>
@@ -2005,54 +1994,7 @@
 
                 </div>
 
-                <script>
-                // Twitter widget loader — render immediately on DOM ready, show fallback if blocked
-                (function() {
-                    var TIMEOUT_MS = 12000;
-                    var rendered = false;
 
-                    function renderWidget() {
-                        if (window.twttr && window.twttr.widgets) {
-                            window.twttr.widgets.load(document.getElementById('tw-widget'));
-                        }
-                    }
-
-                    function checkLoaded() {
-                        var iframe = document.querySelector('#tw-widget iframe');
-                        if (iframe && iframe.offsetHeight > 10) {
-                            rendered = true;
-                            document.getElementById('tw-widget').style.minHeight = '';
-                        }
-                    }
-
-                    // Poll for successful render, show fallback on timeout
-                    var t0 = Date.now();
-                    var poll = setInterval(function() {
-                        checkLoaded();
-                        if (rendered || Date.now() - t0 > TIMEOUT_MS) {
-                            clearInterval(poll);
-                            if (!rendered) {
-                                document.getElementById('tw-widget').style.display = 'none';
-                                document.getElementById('tw-fallback').style.display = 'block';
-                            }
-                        }
-                    }, 400);
-
-                    // Trigger render once twttr SDK is ready
-                    if (window.twttr && window.twttr.ready) {
-                        window.twttr.ready(renderWidget);
-                    } else {
-                        // SDK not yet loaded — retry after short delay
-                        setTimeout(function() {
-                            if (window.twttr && window.twttr.ready) {
-                                window.twttr.ready(renderWidget);
-                            } else {
-                                renderWidget(); // try anyway
-                            }
-                        }, 1500);
-                    }
-                })();
-                </script>
 
             </div>
         </div>
@@ -2108,8 +2050,12 @@
             if (container && !container.innerHTML) {
                 container.innerHTML = TREASURY_MODAL_HTML;
             }
-            const modal = document.getElementById('treasury-loading-modal');
-            if (modal) modal.style.display = 'flex';
+            // Only show modal if treasury tab is active
+            const treasuryTab = document.getElementById('treasury');
+            if (treasuryTab && treasuryTab.classList.contains('active')) {
+                const modal = document.getElementById('treasury-loading-modal');
+                if (modal) modal.style.display = 'block';
+            }
         }
         
         function hideTreasuryLoadingModal() {
@@ -4041,7 +3987,9 @@ function forceChiaRefresh() {
 let _treasuryLastLoad = 0;
 async function loadComprehensiveTreasury() {
     const now = Date.now();
-    if (now - _treasuryLastLoad < 30000) {
+    if (now - _treasuryLastLoad < 600000) {
+        console.log(`⏳ Treasury loaded ${Math.round((now - _treasuryLastLoad)/1000)}s ago, using cache (expires in ${Math.round((600000 - (now - _treasuryLastLoad))/1000)}s)`);
+        return;
         console.log(`⏳ Treasury loaded ${Math.round((now - _treasuryLastLoad)/1000)}s ago, skipping duplicate`);
         return;
     }
