@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
     <title>Caster101</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
@@ -1083,6 +1083,82 @@
 
             .spotify-mini-embed {
                 height: 110px;
+            }
+        }
+
+        /* Mobile layout rehaul - keep desktop vibe without changing desktop */
+        @media (max-width: 768px) {
+            body {
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+                font-synthesis: none;
+            }
+
+            .container {
+                max-width: 640px;
+                padding: 10px;
+                padding-bottom: 28px;
+            }
+
+            .header {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .stats {
+                gap: 8px;
+                justify-content: center;
+            }
+
+            .stat-badge {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 6px;
+            }
+
+            .tab {
+                flex: 1 1 calc(33.333% - 6px);
+                font-size: 10px;
+                padding: 9px 8px;
+                margin: 0;
+            }
+
+            .quick-links {
+                gap: 8px;
+                padding-bottom: 4px;
+                scroll-snap-type: x mandatory;
+            }
+
+            .quick-link-btn {
+                font-size: 11px;
+                padding: 6px 10px;
+                scroll-snap-align: start;
+            }
+
+            .filter-section {
+                gap: 6px;
+            }
+
+            .filter-btn {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+
+            .search-input {
+                font-size: 13px;
+                padding: 12px 12px 12px 38px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab {
+                flex: 1 1 calc(50% - 6px);
+                font-size: 9px;
             }
         }
     </style>
