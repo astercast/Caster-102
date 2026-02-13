@@ -2031,8 +2031,10 @@
                     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
                 ">
                     <iframe
-                        src="/caster-valley-3d.html"
+                        id="caster-valley-frame"
                         title="Caster Valley 3D"
+                        src="about:blank"
+                        data-src="/caster-valley-3d.html"
                         style="
                             width: 100%;
                             height: 80vh;
@@ -2069,6 +2071,13 @@
             window.location.hash = tabName;
             if (tabName === "treasury") {
                 setTimeout(loadComprehensiveTreasury, 100);
+            }
+            if (tabName === "valley") {
+                const frame = document.getElementById('caster-valley-frame');
+                if (frame && !frame.dataset.loaded) {
+                    frame.src = frame.dataset.src;
+                    frame.dataset.loaded = 'true';
+                }
             }
         }
 
