@@ -1517,6 +1517,9 @@
             },
 
             createFarm() {
+                // Shorthand for seeded random
+                const r = () => this.seededRandom.next();
+
                 this.scene.background = new THREE.Color(0x87ceeb);
                 
                 // Reset ground to solid grass
@@ -1540,14 +1543,14 @@
                 for (let i = 0; i < 150; i++) {
                     let x, z;
                     do {
-                        x = (Math.random() - 0.5) * 60;
-                        z = (Math.random() - 0.5) * 60;
+                        x = (r() - 0.5) * 60;
+                        z = (r() - 0.5) * 60;
                     } while ((Math.abs(x) < 18 && Math.abs(z) < 18) || isNearPlot(x, z, 2.2)); // Skip plot area
                     
                     const grassPatch = new THREE.Mesh(
-                        new THREE.CircleGeometry(0.8 + Math.random() * 0.5, 8),
+                        new THREE.CircleGeometry(0.8 + r() * 0.5, 8),
                         new THREE.MeshLambertMaterial({ 
-                            color: [0x6d9450, 0x7ba05b, 0x8fb570][Math.floor(Math.random() * 3)],
+                            color: [0x6d9450, 0x7ba05b, 0x8fb570][Math.floor(r() * 3)],
                             transparent: true,
                             opacity: 0.4
                         })
@@ -1566,8 +1569,8 @@
                 for (let i = 0; i < 200; i++) {
                     let x, z;
                     do {
-                        x = (Math.random() - 0.5) * 60;
-                        z = (Math.random() - 0.5) * 60;
+                        x = (r() - 0.5) * 60;
+                        z = (r() - 0.5) * 60;
                     } while ((Math.abs(x) < 18 && Math.abs(z) < 18) || isNearPlot(x, z, 2.0)); // Skip plot area
                     
                     const grass = new THREE.Mesh(
@@ -1575,7 +1578,7 @@
                         new THREE.MeshLambertMaterial({ color: 0x5a7647 })
                     );
                     grass.position.set(x, 0.08, z);
-                    grass.rotation.x = -Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+                    grass.rotation.x = -Math.PI / 2 + (r() - 0.5) * 0.3;
                     this.scene.add(grass);
                     this.areaObjects.push(grass);
                 }
@@ -1646,14 +1649,14 @@
                 
                 // Add 25 decorative trees scattered across ENTIRE map
                 for (let i = 0; i < 25; i++) {
-                    const x = (Math.random() - 0.5) * 60; // -30 to 30
-                    const z = (Math.random() - 0.5) * 60; // -30 to 30
+                    const x = (r() - 0.5) * 60; // -30 to 30
+                    const z = (r() - 0.5) * 60; // -30 to 30
                     
                     // Skip if too close to center farm plots
                     if (Math.sqrt(x * x + z * z) < 8 || isNearPlot(x, z, 3.2)) continue;
                     
                     const trunk = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.3, 0.4, 3 + Math.random(), 8),
+                        new THREE.CylinderGeometry(0.3, 0.4, 3 + r(), 8),
                         new THREE.MeshLambertMaterial({ color: 0x4a2511 })
                     );
                     trunk.position.set(x, 1.5, z);
@@ -1663,7 +1666,7 @@
                     
                     // Tree leaves
                     const leaves = new THREE.Mesh(
-                        new THREE.SphereGeometry(1.5 + Math.random() * 0.5, 8, 8),
+                        new THREE.SphereGeometry(1.5 + r() * 0.5, 8, 8),
                         new THREE.MeshLambertMaterial({ color: 0x2d5016 })
                     );
                     leaves.position.set(x, 3.5, z);
@@ -1676,15 +1679,15 @@
                 for (let i = 0; i < 150; i++) {
                     let x, z;
                     do {
-                        x = (Math.random() - 0.5) * 60;
-                        z = (Math.random() - 0.5) * 60;
+                        x = (r() - 0.5) * 60;
+                        z = (r() - 0.5) * 60;
                     } while ((Math.abs(x) < 18 && Math.abs(z) < 18) || isNearPlot(x, z, 2.2)); // Bigger avoid zone
                     
                     const flower = new THREE.Mesh(
                         new THREE.SphereGeometry(0.15, 6, 6),
                         new THREE.MeshLambertMaterial({ 
-                            color: [0xff6b6b, 0xffd93d, 0xffffff, 0xff69b4, 0x9d84b7][Math.floor(Math.random() * 5)],
-                            emissive: [0xff6b6b, 0xffd93d, 0xffffff, 0xff69b4, 0x9d84b7][Math.floor(Math.random() * 5)],
+                            color: [0xff6b6b, 0xffd93d, 0xffffff, 0xff69b4, 0x9d84b7][Math.floor(r() * 5)],
+                            emissive: [0xff6b6b, 0xffd93d, 0xffffff, 0xff69b4, 0x9d84b7][Math.floor(r() * 5)],
                             emissiveIntensity: 0.3
                         })
                     );
@@ -1697,16 +1700,16 @@
                 for (let i = 0; i < 60; i++) {
                     let x, z;
                     do {
-                        x = (Math.random() - 0.5) * 60;
-                        z = (Math.random() - 0.5) * 60;
+                        x = (r() - 0.5) * 60;
+                        z = (r() - 0.5) * 60;
                     } while ((Math.abs(x) < 18 && Math.abs(z) < 18) || isNearPlot(x, z, 2.2)); // Bigger avoid zone
                     
                     const rock = new THREE.Mesh(
-                        new THREE.DodecahedronGeometry(0.3 + Math.random() * 0.3, 0),
+                        new THREE.DodecahedronGeometry(0.3 + r() * 0.3, 0),
                         new THREE.MeshLambertMaterial({ color: 0x808080 })
                     );
                     rock.position.set(x, 0.2, z);
-                    rock.rotation.set(Math.random(), Math.random(), Math.random());
+                    rock.rotation.set(r(), r(), r());
                     this.scene.add(rock);
                     this.areaObjects.push(rock);
                 }
@@ -1715,12 +1718,12 @@
                 for (let i = 0; i < 80; i++) {
                     let x, z;
                     do {
-                        x = (Math.random() - 0.5) * 60;
-                        z = (Math.random() - 0.5) * 60;
+                        x = (r() - 0.5) * 60;
+                        z = (r() - 0.5) * 60;
                     } while ((Math.abs(x) < 18 && Math.abs(z) < 18) || isNearPlot(x, z, 2.2)); // Bigger avoid zone
                     
                     const bush = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.5 + Math.random() * 0.3, 8, 8),
+                        new THREE.SphereGeometry(0.5 + r() * 0.3, 8, 8),
                         new THREE.MeshLambertMaterial({ color: 0x2d5016 })
                     );
                     bush.position.set(x, 0.3, z);
@@ -1746,17 +1749,17 @@
                 
                 // Natural fence posts scattered around perimeter (not circular!)
                 for (let i = 0; i < 30; i++) {
-                    const angle = (i / 30) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
-                    const distance = 24 + Math.random() * 6;
+                    const angle = (i / 30) * Math.PI * 2 + (r() - 0.5) * 0.8;
+                    const distance = 24 + r() * 6;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     
                     const post = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.12, 0.12, 1.5 + Math.random() * 0.5, 8),
+                        new THREE.CylinderGeometry(0.12, 0.12, 1.5 + r() * 0.5, 8),
                         new THREE.MeshLambertMaterial({ color: 0x8b4513 })
                     );
                     post.position.set(x, 0.75, z);
-                    post.rotation.z = (Math.random() - 0.5) * 0.2; // Slight tilt
+                    post.rotation.z = (r() - 0.5) * 0.2; // Slight tilt
                     post.castShadow = true;
                     this.scene.add(post);
                     this.areaObjects.push(post);
@@ -1824,15 +1827,15 @@
                 for (let i = 0; i < 40; i++) {
                     let x, z;
                     do {
-                        x = (Math.random() - 0.5) * 12;
-                        z = (Math.random() - 0.5) * 12;
+                        x = (r() - 0.5) * 12;
+                        z = (r() - 0.5) * 12;
                     } while (isNearPlot(x, z, 1.2));
                     const tuft = new THREE.Mesh(
                         new THREE.ConeGeometry(0.15, 0.3, 6),
                         new THREE.MeshLambertMaterial({ color: 0x5a7647 })
                     );
                     tuft.position.set(x, 0.15, z);
-                    tuft.rotation.x = (Math.random() - 0.5) * 0.4;
+                    tuft.rotation.x = (r() - 0.5) * 0.4;
                     this.scene.add(tuft);
                     this.areaObjects.push(tuft);
                 }
@@ -1896,19 +1899,19 @@
                 
                 // Rocky dirt patches for texture
                 for (let i = 0; i < 40; i++) {
-                    const patchSize = 1.5 + Math.random() * 2;
+                    const patchSize = 1.5 + r() * 2;
                     const patch = new THREE.Mesh(
                         new THREE.CircleGeometry(patchSize, 8),
                         new THREE.MeshLambertMaterial({ 
-                            color: [0x5a3d2f, 0x4a2d1f, 0x6d4c2f][Math.floor(Math.random() * 3)],
+                            color: [0x5a3d2f, 0x4a2d1f, 0x6d4c2f][Math.floor(r() * 3)],
                             transparent: true,
                             opacity: 0.6
                         })
                     );
                     patch.position.set(
-                        (Math.random() - 0.5) * 40,
+                        (r() - 0.5) * 40,
                         0.02,
-                        (Math.random() - 0.5) * 40
+                        (r() - 0.5) * 40
                     );
                     patch.rotation.x = -Math.PI / 2;
                     this.scene.add(patch);
@@ -1918,13 +1921,13 @@
                 // Small pebbles scattered
                 for (let i = 0; i < 60; i++) {
                     const pebble = new THREE.Mesh(
-                        new THREE.CircleGeometry(0.1 + Math.random() * 0.2, 6),
+                        new THREE.CircleGeometry(0.1 + r() * 0.2, 6),
                         new THREE.MeshLambertMaterial({ color: 0x808080, transparent: true, opacity: 0.7 })
                     );
                     pebble.position.set(
-                        (Math.random() - 0.5) * 38,
+                        (r() - 0.5) * 38,
                         0.02,
-                        (Math.random() - 0.5) * 38
+                        (r() - 0.5) * 38
                     );
                     pebble.rotation.x = -Math.PI / 2;
                     this.scene.add(pebble);
@@ -1940,8 +1943,8 @@
                     const nextAngle = ((i + 1) / 30) * Math.PI * 2;
                     
                     // Vary distance for organic feel
-                    const distance = 36 + Math.sin(i * 0.5) * 5 + (Math.random() - 0.5) * 2;
-                    const nextDistance = 36 + Math.sin((i + 1) * 0.5) * 5 + (Math.random() - 0.5) * 2;
+                    const distance = 36 + Math.sin(i * 0.5) * 5 + (r() - 0.5) * 2;
+                    const nextDistance = 36 + Math.sin((i + 1) * 0.5) * 5 + (r() - 0.5) * 2;
                     
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
@@ -1950,10 +1953,10 @@
                     
                     // Calculate wall width to connect to next segment
                     const width = Math.sqrt((nextX - x) ** 2 + (nextZ - z) ** 2) + 1;
-                    const height = 8 + Math.random() * 4;
+                    const height = 8 + r() * 4;
                     
                     const wall = new THREE.Mesh(
-                        new THREE.BoxGeometry(width, height, 3 + Math.random()),
+                        new THREE.BoxGeometry(width, height, 3 + r()),
                         wallMat
                     );
                     
@@ -1973,15 +1976,15 @@
                     // Add rocky protrusions for texture
                     for (let j = 0; j < 2; j++) {
                         const rock = new THREE.Mesh(
-                            new THREE.DodecahedronGeometry(0.5 + Math.random() * 0.4, 0),
+                            new THREE.DodecahedronGeometry(0.5 + r() * 0.4, 0),
                             new THREE.MeshLambertMaterial({ color: 0x666666 })
                         );
                         rock.position.set(
-                            wall.position.x + (Math.random() - 0.5) * 2,
-                            wall.position.y + (Math.random() - 0.5) * height * 0.5,
-                            wall.position.z + (Math.random() - 0.5) * 2
+                            wall.position.x + (r() - 0.5) * 2,
+                            wall.position.y + (r() - 0.5) * height * 0.5,
+                            wall.position.z + (r() - 0.5) * 2
                         );
-                        rock.rotation.set(Math.random(), Math.random(), Math.random());
+                        rock.rotation.set(r(), r(), r());
                         this.scene.add(rock);
                         this.areaObjects.push(rock);
                     }
@@ -2015,12 +2018,12 @@
                 for (let i = 0; i < 60; i++) {
                     const stalactite = new THREE.Mesh(stalactiteGeo, stalactiteMat);
                     stalactite.position.set(
-                        (Math.random() - 0.5) * 80,
-                        9 + Math.random() * 2,
-                        (Math.random() - 0.5) * 80
+                        (r() - 0.5) * 80,
+                        9 + r() * 2,
+                        (r() - 0.5) * 80
                     );
                     stalactite.rotation.x = Math.PI;
-                    stalactite.scale.set(1, 0.8 + Math.random() * 0.6, 1);
+                    stalactite.scale.set(1, 0.8 + r() * 0.6, 1);
                     this.scene.add(stalactite);
                     this.areaObjects.push(stalactite);
                 }
@@ -2031,11 +2034,11 @@
                 for (let i = 0; i < 50; i++) {
                     const stalagmite = new THREE.Mesh(stalagmiteGeo, stalagmiteMat);
                     stalagmite.position.set(
-                        (Math.random() - 0.5) * 80,
+                        (r() - 0.5) * 80,
                         1.25,
-                        (Math.random() - 0.5) * 80
+                        (r() - 0.5) * 80
                     );
-                    stalagmite.scale.set(1, 0.7 + Math.random() * 0.8, 1);
+                    stalagmite.scale.set(1, 0.7 + r() * 0.8, 1);
                     stalagmite.castShadow = true;
                     this.scene.add(stalagmite);
                     this.areaObjects.push(stalagmite);
@@ -2043,8 +2046,8 @@
                 
                 // 15 Column formations spread across ENTIRE mine floor
                 for (let i = 0; i < 15; i++) {
-                    const x = (Math.random() - 0.5) * 70;
-                    const z = (Math.random() - 0.5) * 70;
+                    const x = (r() - 0.5) * 70;
+                    const z = (r() - 0.5) * 70;
                     const column = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.4, 0.45, 10, 8),
                         new THREE.MeshLambertMaterial({ color: 0x6a6a6a })
@@ -2057,8 +2060,8 @@
                 
                 // 20 Mine carts spread randomly across ENTIRE mine
                 for (let i = 0; i < 20; i++) {
-                    const cartX = (Math.random() - 0.5) * 70;
-                    const cartZ = (Math.random() - 0.5) * 70;
+                    const cartX = (r() - 0.5) * 70;
+                    const cartZ = (r() - 0.5) * 70;
                     const cartBody = new THREE.Mesh(
                         new THREE.BoxGeometry(1.2, 0.6, 0.8),
                         new THREE.MeshLambertMaterial({ color: 0x8b4513 })
@@ -2080,14 +2083,14 @@
                 
                 // 35 Pickaxes scattered across ENTIRE mine
                 for (let i = 0; i < 35; i++) {
-                    const px = (Math.random() - 0.5) * 70;
-                    const pz = (Math.random() - 0.5) * 70;
+                    const px = (r() - 0.5) * 70;
+                    const pz = (r() - 0.5) * 70;
                     const handle = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.05, 0.05, 1.2, 8),
                         new THREE.MeshLambertMaterial({ color: 0x8b4513 })
                     );
                     handle.position.set(px, 0.6, pz);
-                    handle.rotation.z = Math.PI / 4 + Math.random() * 0.5;
+                    handle.rotation.z = Math.PI / 4 + r() * 0.5;
                     this.scene.add(handle);
                     this.areaObjects.push(handle);
                     
@@ -2102,8 +2105,8 @@
                 
                 // 40 Glowing lanterns scattered throughout mine
                 for (let i = 0; i < 40; i++) {
-                    const x = (Math.random() - 0.5) * 70;
-                    const z = (Math.random() - 0.5) * 70;
+                    const x = (r() - 0.5) * 70;
+                    const z = (r() - 0.5) * 70;
                     const lantern = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.2, 0.3, 0.6, 8),
                         new THREE.MeshLambertMaterial({ 
@@ -2126,11 +2129,11 @@
                 const boulderGeo = new THREE.SphereGeometry(0.8, 8, 8);
                 const boulderMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
                 for (let i = 0; i < 50; i++) {
-                    const x = (Math.random() - 0.5) * 70;
-                    const z = (Math.random() - 0.5) * 70;
+                    const x = (r() - 0.5) * 70;
+                    const z = (r() - 0.5) * 70;
                     for (let j = 0; j < 2; j++) {
                         const boulder = new THREE.Mesh(boulderGeo, boulderMat);
-                        boulder.position.set(x + (Math.random() - 0.5) * 2, 0.4 + j * 0.6, z + (Math.random() - 0.5) * 2);
+                        boulder.position.set(x + (r() - 0.5) * 2, 0.4 + j * 0.6, z + (r() - 0.5) * 2);
                         boulder.scale.set(1.2, 0.8, 1);
                         this.scene.add(boulder);
                         this.areaObjects.push(boulder);
@@ -2143,8 +2146,8 @@
                     // Random position with minimum distance from other rocks
                     let x, z, tooClose;
                     do {
-                        x = (Math.random() - 0.5) * 65; // -32.5 to 32.5 (much wider spread)
-                        z = (Math.random() - 0.5) * 65; // -32.5 to 32.5
+                        x = (r() - 0.5) * 65; // -32.5 to 32.5 (much wider spread)
+                        z = (r() - 0.5) * 65; // -32.5 to 32.5
                         
                         // Check distance from existing rocks
                         tooClose = false;
@@ -2169,13 +2172,13 @@
                         })
                     );
                     rock.position.set(x, 1.8, z);
-                    rock.rotation.set(Math.random(), Math.random(), Math.random());
+                    rock.rotation.set(r(), r(), r());
                     rock.castShadow = true;
                     this.scene.add(rock);
                     this.areaObjects.push(rock);
                     
                     // Add 5-8 BLUE CRYSTAL SHARDS embedded in the rock (not glowing diamonds)
-                    const numShards = 5 + Math.floor(Math.random() * 4);
+                    const numShards = 5 + Math.floor(r() * 4);
                     for (let j = 0; j < numShards; j++) {
                         const shard = new THREE.Mesh(
                             new THREE.BoxGeometry(0.15, 0.4, 0.08), // Flat crystal shard shape
@@ -2188,8 +2191,8 @@
                             })
                         );
                         // Position shards embedded in rock surface
-                        const angle = (j / numShards) * Math.PI * 2 + Math.random();
-                        const vertAngle = Math.random() * Math.PI;
+                        const angle = (j / numShards) * Math.PI * 2 + r();
+                        const vertAngle = r() * Math.PI;
                         const surfaceX = x + Math.cos(angle) * Math.sin(vertAngle) * 1.3;
                         const surfaceY = 1.8 + Math.cos(vertAngle) * 1.3;
                         const surfaceZ = z + Math.sin(angle) * Math.sin(vertAngle) * 1.3;
@@ -2199,7 +2202,7 @@
                         // Rotate shard to point outward from rock center
                         shard.lookAt(x, 1.8, z);
                         shard.rotateX(Math.PI / 2);
-                        shard.rotation.z += (Math.random() - 0.5) * 0.5;
+                        shard.rotation.z += (r() - 0.5) * 0.5;
                         
                         this.scene.add(shard);
                         this.areaObjects.push(shard);
@@ -2231,19 +2234,19 @@
                 
                 // Mossy patches across ENTIRE map
                 for (let i = 0; i < 80; i++) {
-                    const patchSize = 2 + Math.random() * 3;
+                    const patchSize = 2 + r() * 3;
                     const patch = new THREE.Mesh(
                         new THREE.CircleGeometry(patchSize, 12),
                         new THREE.MeshLambertMaterial({ 
-                            color: [0x3a6b2d, 0x2d5016, 0x1a3d10][Math.floor(Math.random() * 3)],
+                            color: [0x3a6b2d, 0x2d5016, 0x1a3d10][Math.floor(r() * 3)],
                             transparent: true,
                             opacity: 0.5
                         })
                     );
                     patch.position.set(
-                        (Math.random() - 0.5) * 60, // Full map coverage
+                        (r() - 0.5) * 60, // Full map coverage
                         0.01 + i * 0.0001, // Prevent z-fighting
-                        (Math.random() - 0.5) * 60
+                        (r() - 0.5) * 60
                     );
                     patch.rotation.x = -Math.PI / 2;
                     this.scene.add(patch);
@@ -2253,20 +2256,20 @@
                 // Scattered leaves across ENTIRE map
                 for (let i = 0; i < 150; i++) {
                     const leaf = new THREE.Mesh(
-                        new THREE.CircleGeometry(0.15 + Math.random() * 0.1, 5),
+                        new THREE.CircleGeometry(0.15 + r() * 0.1, 5),
                         new THREE.MeshLambertMaterial({ 
-                            color: [0x8b4513, 0xa0522d, 0xd2691e][Math.floor(Math.random() * 3)],
+                            color: [0x8b4513, 0xa0522d, 0xd2691e][Math.floor(r() * 3)],
                             transparent: true,
                             opacity: 0.7
                         })
                     );
                     leaf.position.set(
-                        (Math.random() - 0.5) * 60,
+                        (r() - 0.5) * 60,
                         0.02 + i * 0.00005,
-                        (Math.random() - 0.5) * 60
+                        (r() - 0.5) * 60
                     );
                     leaf.rotation.x = -Math.PI / 2;
-                    leaf.rotation.z = Math.random() * Math.PI;
+                    leaf.rotation.z = r() * Math.PI;
                     this.scene.add(leaf);
                     this.areaObjects.push(leaf);
                 }
@@ -2277,13 +2280,13 @@
                     // Random position avoiding center area where trolls/dragon are
                     let x, z;
                     do {
-                        x = (Math.random() - 0.5) * 60;
-                        z = (Math.random() - 0.5) * 60;
+                        x = (r() - 0.5) * 60;
+                        z = (r() - 0.5) * 60;
                     } while (Math.sqrt(x * x + z * z) < 8); // Keep center clear
                     
                     treePositions.push({ x, z }); // Store position
                     
-                    const trunkHeight = 4 + Math.random() * 2;
+                    const trunkHeight = 4 + r() * 2;
                     const trunk = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.4, 0.5, trunkHeight, 8),
                         new THREE.MeshLambertMaterial({ color: 0x4a2511 })
@@ -2310,13 +2313,13 @@
                 // 100 Green bushes spread across map
                 for (let i = 0; i < 100; i++) {
                     const bush = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.6 + Math.random() * 0.3, 8, 8),
+                        new THREE.SphereGeometry(0.6 + r() * 0.3, 8, 8),
                         new THREE.MeshLambertMaterial({ color: 0x2d5016 })
                     );
                     bush.position.set(
-                        (Math.random() - 0.5) * 60,
+                        (r() - 0.5) * 60,
                         0.3,
-                        (Math.random() - 0.5) * 60
+                        (r() - 0.5) * 60
                     );
                     bush.scale.set(1, 0.6, 1);
                     this.scene.add(bush);
@@ -2329,12 +2332,12 @@
                 for (let i = 0; i < 15; i++) {
                     const log = new THREE.Mesh(logGeo, logMat);
                     log.position.set(
-                        (Math.random() - 0.5) * 60,
+                        (r() - 0.5) * 60,
                         0.3,
-                        (Math.random() - 0.5) * 60
+                        (r() - 0.5) * 60
                     );
                     log.rotation.z = Math.PI / 2;
-                    log.rotation.y = Math.random() * Math.PI;
+                    log.rotation.y = r() * Math.PI;
                     this.scene.add(log);
                     this.areaObjects.push(log);
                 }
@@ -2342,23 +2345,23 @@
                 // 40 Gray rocks scattered across map
                 for (let i = 0; i < 40; i++) {
                     const rock = new THREE.Mesh(
-                        new THREE.DodecahedronGeometry(0.4 + Math.random() * 0.3, 0),
+                        new THREE.DodecahedronGeometry(0.4 + r() * 0.3, 0),
                         new THREE.MeshLambertMaterial({ color: 0x808080 })
                     );
                     rock.position.set(
-                        (Math.random() - 0.5) * 60,
+                        (r() - 0.5) * 60,
                         0.3,
-                        (Math.random() - 0.5) * 60
+                        (r() - 0.5) * 60
                     );
-                    rock.rotation.set(Math.random(), Math.random(), Math.random());
+                    rock.rotation.set(r(), r(), r());
                     this.scene.add(rock);
                     this.areaObjects.push(rock);
                 }
                 
                 // 30 Mushrooms across forest
                 for (let i = 0; i < 30; i++) {
-                    const x = (Math.random() - 0.5) * 60;
-                    const z = (Math.random() - 0.5) * 60;
+                    const x = (r() - 0.5) * 60;
+                    const z = (r() - 0.5) * 60;
                     
                     const stem = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.12, 0.15, 0.35, 8),
@@ -2371,7 +2374,7 @@
                     const cap = new THREE.Mesh(
                         new THREE.SphereGeometry(0.28, 8, 8),
                         new THREE.MeshLambertMaterial({ 
-                            color: [0xff0000, 0xff6b6b, 0x8b4513][Math.floor(Math.random() * 3)]
+                            color: [0xff0000, 0xff6b6b, 0x8b4513][Math.floor(r() * 3)]
                         })
                     );
                     cap.position.set(x, 0.45, z);
@@ -2386,12 +2389,12 @@
                 for (let i = 0; i < 20; i++) {
                     const rock = new THREE.Mesh(rockGeo, rockMat);
                     rock.position.set(
-                        (Math.random() - 0.5) * 40,
+                        (r() - 0.5) * 40,
                         0.25,
-                        (Math.random() - 0.5) * 40
+                        (r() - 0.5) * 40
                     );
-                    rock.rotation.set(Math.random(), Math.random(), Math.random());
-                    rock.scale.set(0.8 + Math.random() * 0.4, 0.8 + Math.random() * 0.4, 0.8 + Math.random() * 0.4);
+                    rock.rotation.set(r(), r(), r());
+                    rock.scale.set(0.8 + r() * 0.4, 0.8 + r() * 0.4, 0.8 + r() * 0.4);
                     this.scene.add(rock);
                     this.areaObjects.push(rock);
                 }
@@ -2768,8 +2771,8 @@
                 
                 // Add minimal seaweed patches in water
                 for (let i = 0; i < 12; i++) {
-                    const x = (Math.random() - 0.5) * 14;
-                    const z = (Math.random() - 0.5) * 14;
+                    const x = (r() - 0.5) * 14;
+                    const z = (r() - 0.5) * 14;
                     const dist = Math.sqrt(x * x + z * z);
                     if (dist < 7) {
                         const seaweed = new THREE.Mesh(
@@ -2777,7 +2780,7 @@
                             new THREE.MeshLambertMaterial({ color: 0x2d5016, emissive: 0x1a3d10, emissiveIntensity: 0.2 })
                         );
                         seaweed.position.set(x, 0.4, z);
-                        seaweed.rotation.x = (Math.random() - 0.5) * 0.3;
+                        seaweed.rotation.x = (r() - 0.5) * 0.3;
                         this.scene.add(seaweed);
                         this.areaObjects.push(seaweed);
                     }
@@ -2785,15 +2788,15 @@
                 
                 // Add few coral formations
                 for (let i = 0; i < 8; i++) {
-                    const x = (Math.random() - 0.5) * 12;
-                    const z = (Math.random() - 0.5) * 12;
+                    const x = (r() - 0.5) * 12;
+                    const z = (r() - 0.5) * 12;
                     const dist = Math.sqrt(x * x + z * z);
                     if (dist < 6) {
                         const coral = new THREE.Mesh(
-                            new THREE.SphereGeometry(0.2 + Math.random() * 0.15, 6, 6),
+                            new THREE.SphereGeometry(0.2 + r() * 0.15, 6, 6),
                             new THREE.MeshLambertMaterial({ 
-                                color: [0xff6b6b, 0xffd93d, 0x9d84b7][Math.floor(Math.random() * 3)],
-                                emissive: [0xff6b6b, 0xffd93d, 0x9d84b7][Math.floor(Math.random() * 3)],
+                                color: [0xff6b6b, 0xffd93d, 0x9d84b7][Math.floor(r() * 3)],
+                                emissive: [0xff6b6b, 0xffd93d, 0x9d84b7][Math.floor(r() * 3)],
                                 emissiveIntensity: 0.3
                             })
                         );
@@ -2815,21 +2818,21 @@
                 
                 // Reduced sand patches for cleaner look
                 for (let i = 0; i < 80; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = 14 + Math.random() * 28;
-                    const x = Math.cos(angle) * distance + (Math.random() - 0.5) * 4;
-                    const z = Math.sin(angle) * distance + (Math.random() - 0.5) * 4;
+                    const angle = r() * Math.PI * 2;
+                    const distance = 14 + r() * 28;
+                    const x = Math.cos(angle) * distance + (r() - 0.5) * 4;
+                    const z = Math.sin(angle) * distance + (r() - 0.5) * 4;
                     const sandPatch = new THREE.Mesh(
-                        new THREE.CircleGeometry(0.8 + Math.random() * 1.5, 8),
+                        new THREE.CircleGeometry(0.8 + r() * 1.5, 8),
                         new THREE.MeshLambertMaterial({ 
-                            color: [0xedd9a8, 0xf4a460, 0xdeb887][Math.floor(Math.random() * 3)],
+                            color: [0xedd9a8, 0xf4a460, 0xdeb887][Math.floor(r() * 3)],
                             transparent: true,
                             opacity: 0.6
                         })
                     );
                     sandPatch.position.set(x, 0.085 + i * 0.00005, z);
                     sandPatch.rotation.x = -Math.PI / 2;
-                    sandPatch.rotation.z = Math.random() * Math.PI;
+                    sandPatch.rotation.z = r() * Math.PI;
                     this.scene.add(sandPatch);
                     this.areaObjects.push(sandPatch);
                 }
@@ -2840,10 +2843,10 @@
                     for (let j = 0; j < 6; j++) {
                         const distance = 20 + j * 2.5;
                         const width = 4 - j * 0.5;
-                        const x = Math.cos(baseAngle) * distance + (Math.random() - 0.5) * width;
-                        const z = Math.sin(baseAngle) * distance + (Math.random() - 0.5) * width;
+                        const x = Math.cos(baseAngle) * distance + (r() - 0.5) * width;
+                        const z = Math.sin(baseAngle) * distance + (r() - 0.5) * width;
                         const patch = new THREE.Mesh(
-                            new THREE.CircleGeometry(1 + Math.random() * 0.8, 8),
+                            new THREE.CircleGeometry(1 + r() * 0.8, 8),
                             new THREE.MeshLambertMaterial({ color: 0xf4a460, transparent: true, opacity: 0.7 })
                         );
                         patch.position.set(x, 0.09, z);
@@ -2856,8 +2859,8 @@
                 // Reduced palm trees for cleaner look
                 const numPalms = 20;
                 for (let i = 0; i < numPalms; i++) {
-                    const angle = (i / numPalms) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
-                    const distance = 18 + Math.random() * 15;
+                    const angle = (i / numPalms) * Math.PI * 2 + (r() - 0.5) * 0.8;
+                    const distance = 18 + r() * 15;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     
@@ -2892,8 +2895,8 @@
                 
                 // Reduced coconuts
                 for (let i = 0; i < 20; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = 16 + Math.random() * 18;
+                    const angle = r() * Math.PI * 2;
+                    const distance = 16 + r() * 18;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     const coconut = new THREE.Mesh(
@@ -2908,43 +2911,43 @@
                 // Minimal beach rocks
                 for (let i = 0; i < 15; i++) {
                     const angle = (i / 15) * Math.PI * 2;
-                    const distance = 14 + Math.random() * 3;
+                    const distance = 14 + r() * 3;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     const rock = new THREE.Mesh(
-                        new THREE.DodecahedronGeometry(0.35 + Math.random() * 0.3, 0),
+                        new THREE.DodecahedronGeometry(0.35 + r() * 0.3, 0),
                         new THREE.MeshLambertMaterial({ color: 0x808080 })
                     );
                     rock.position.set(x, 0.3, z);
-                    rock.rotation.set(Math.random(), Math.random(), Math.random());
+                    rock.rotation.set(r(), r(), r());
                     this.scene.add(rock);
                     this.areaObjects.push(rock);
                 }
                 
                 // Few floating logs
                 for (let i = 0; i < 6; i++) {
-                    const x = (Math.random() - 0.5) * 40;
-                    const z = (Math.random() - 0.5) * 40;
+                    const x = (r() - 0.5) * 40;
+                    const z = (r() - 0.5) * 40;
                     const log = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.2, 0.2, 2 + Math.random(), 8),
+                        new THREE.CylinderGeometry(0.2, 0.2, 2 + r(), 8),
                         new THREE.MeshLambertMaterial({ color: 0x4a2511 })
                     );
                     log.position.set(x, 0.1, z);
                     log.rotation.z = Math.PI / 2;
-                    log.rotation.y = Math.random() * Math.PI;
+                    log.rotation.y = r() * Math.PI;
                     this.scene.add(log);
                     this.areaObjects.push(log);
                 }
                 
                 // Few seaweed plants in center area
                 for (let i = 0; i < 8; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = 4 + Math.random() * 5;
+                    const angle = r() * Math.PI * 2;
+                    const distance = 4 + r() * 5;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     
                     const seaweed = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.05 + Math.random() * 0.05, 0.1, 1.5, 8),
+                        new THREE.CylinderGeometry(0.05 + r() * 0.05, 0.1, 1.5, 8),
                         new THREE.MeshLambertMaterial({ color: 0x2d5016, transparent: true, opacity: 0.5 })
                     );
                     seaweed.position.set(x, 0.75, z);
@@ -3035,12 +3038,12 @@
                     { icon: '🐠', sp: 350, speed: 0.05, size: 0.6, color: 0xff8c42 },
                     { icon: '🐡', sp: 500, speed: 0.07, size: 0.48, color: 0x4a90e2 },
                 ];
-                const type = fishTypes[Math.floor(Math.random() * fishTypes.length)];
+                const type = fishTypes[Math.floor(r() * fishTypes.length)];
                 
                 // Spawn fish in water only (inside radius 9 circle)
-                const side = Math.random() < 0.5 ? -1 : 1;
+                const side = r() < 0.5 ? -1 : 1;
                 const x = side * 12;
-                const z = (Math.random() - 0.5) * 12;
+                const z = (r() - 0.5) * 12;
                 
                 // Create fish group
                 const fishGroup = new THREE.Group();
@@ -3131,17 +3134,17 @@
                 const dustColors = [0x4b0082, 0x8b008b, 0x4169e1, 0x1e90ff, 0x9370db];
                 for (let i = 0; i < 25; i++) {
                     const dust = new THREE.Mesh(
-                        new THREE.CircleGeometry(3 + Math.random() * 4, 24),
+                        new THREE.CircleGeometry(3 + r() * 4, 24),
                         new THREE.MeshBasicMaterial({ 
-                            color: dustColors[Math.floor(Math.random() * dustColors.length)],
+                            color: dustColors[Math.floor(r() * dustColors.length)],
                             transparent: true,
                             opacity: 0.15
                         })
                     );
                     dust.position.set(
-                        (Math.random() - 0.5) * 40,
+                        (r() - 0.5) * 40,
                         0.02,
-                        (Math.random() - 0.5) * 40
+                        (r() - 0.5) * 40
                     );
                     dust.rotation.x = -Math.PI / 2;
                     this.scene.add(dust);
@@ -3150,7 +3153,7 @@
                 
                 // Stardust particles on ground
                 for (let i = 0; i < 100; i++) {
-                    const stardustSize = 0.05 + Math.random() * 0.1;
+                    const stardustSize = 0.05 + r() * 0.1;
                     const stardust = new THREE.Mesh(
                         new THREE.CircleGeometry(stardustSize, 6),
                         new THREE.MeshBasicMaterial({ 
@@ -3160,9 +3163,9 @@
                         })
                     );
                     stardust.position.set(
-                        (Math.random() - 0.5) * 30,
+                        (r() - 0.5) * 30,
                         0.02,
-                        (Math.random() - 0.5) * 30
+                        (r() - 0.5) * 30
                     );
                     stardust.rotation.x = -Math.PI / 2;
                     this.scene.add(stardust);
@@ -3175,20 +3178,20 @@
                     const starMat = new THREE.MeshBasicMaterial({
                         color: 0xffffff,
                         transparent: true,
-                        opacity: 0.55 + Math.random() * 0.4
+                        opacity: 0.55 + r() * 0.4
                     });
                     const star = new THREE.Mesh(starGeo, starMat);
                     star.position.set(
-                        (Math.random() - 0.5) * 60,
-                        Math.random() * 40 + 5,
-                        (Math.random() - 0.5) * 60
+                        (r() - 0.5) * 60,
+                        r() * 40 + 5,
+                        (r() - 0.5) * 60
                     );
                     this.scene.add(star);
                     this.areaObjects.push(star);
                     star.userData = {
                         baseOpacity: starMat.opacity,
-                        twinkleSpeed: 0.6 + Math.random() * 1.2,
-                        phase: Math.random() * Math.PI * 2
+                        twinkleSpeed: 0.6 + r() * 1.2,
+                        phase: r() * Math.PI * 2
                     };
                     this.astralStars.push(star);
                 }
@@ -3223,21 +3226,21 @@
                     const asteroidMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
                     const asteroid = new THREE.Mesh(asteroidGeo, asteroidMat);
                     asteroid.position.set(
-                        (Math.random() - 0.5) * 40,
-                        Math.random() * 20 + 3,
-                        (Math.random() - 0.5) * 40
+                        (r() - 0.5) * 40,
+                        r() * 20 + 3,
+                        (r() - 0.5) * 40
                     );
-                    asteroid.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                    asteroid.rotation.set(r() * Math.PI, r() * Math.PI, r() * Math.PI);
                     this.scene.add(asteroid);
                     this.areaObjects.push(asteroid);
                     this.astralAsteroids.push({
                         mesh: asteroid,
-                        spinX: 0.002 + Math.random() * 0.004,
-                        spinY: 0.002 + Math.random() * 0.004,
-                        spinZ: 0.001 + Math.random() * 0.003,
-                        bobSpeed: 0.4 + Math.random() * 0.6,
+                        spinX: 0.002 + r() * 0.004,
+                        spinY: 0.002 + r() * 0.004,
+                        spinZ: 0.001 + r() * 0.003,
+                        bobSpeed: 0.4 + r() * 0.6,
                         baseY: asteroid.position.y,
-                        phase: Math.random() * Math.PI * 2
+                        phase: r() * Math.PI * 2
                     });
                 }
                 
@@ -3253,16 +3256,16 @@
                         })
                     );
                     nebula.position.set(
-                        (Math.random() - 0.5) * 50,
-                        Math.random() * 30 + 5,
-                        (Math.random() - 0.5) * 50
+                        (r() - 0.5) * 50,
+                        r() * 30 + 5,
+                        (r() - 0.5) * 50
                     );
                     this.scene.add(nebula);
                     this.areaObjects.push(nebula);
                     this.astralNebulas.push({
                         mesh: nebula,
-                        baseOpacity: 0.08 + Math.random() * 0.06,
-                        phase: Math.random() * Math.PI * 2
+                        baseOpacity: 0.08 + r() * 0.06,
+                        phase: r() * Math.PI * 2
                     });
                 }
                 
@@ -3277,22 +3280,22 @@
                 }
                 crystalPositions.push([0, 4], [3, -2], [-3, -2]);
                 crystalPositions.forEach(([x, z], i) => {
-                    const size = 0.6 + Math.random() * 0.5;
+                    const size = 0.6 + r() * 0.5;
                     const crystal = new THREE.Mesh(
                         new THREE.OctahedronGeometry(size, 0),
                         new THREE.MeshLambertMaterial({ color: 0x9370db, emissive: 0x6f4bd9, emissiveIntensity: 0.7 })
                     );
-                    const baseY = 1.6 + Math.random() * 1.6;
+                    const baseY = 1.6 + r() * 1.6;
                     crystal.position.set(x, baseY, z);
-                    crystal.rotation.set(Math.random(), Math.random(), Math.random());
+                    crystal.rotation.set(r(), r(), r());
                     this.scene.add(crystal);
                     this.areaObjects.push(crystal);
                     this.astralCrystals.push({
                         mesh: crystal,
                         baseY,
-                        bobSpeed: 0.6 + Math.random() * 0.8,
-                        phase: Math.random() * Math.PI * 2,
-                        spin: 0.01 + Math.random() * 0.02
+                        bobSpeed: 0.6 + r() * 0.8,
+                        phase: r() * Math.PI * 2,
+                        spin: 0.01 + r() * 0.02
                     });
                 });
 
@@ -3325,8 +3328,8 @@
                 this.areaObjects.push(portalHalo);
 
                 this.astralRings.push(
-                    { mesh: portalRing, baseOpacity: 0.4, phase: Math.random() * Math.PI * 2, spin: 0.004 },
-                    { mesh: portalHalo, baseOpacity: 0.3, phase: Math.random() * Math.PI * 2, spin: 0.006 }
+                    { mesh: portalRing, baseOpacity: 0.4, phase: r() * Math.PI * 2, spin: 0.004 },
+                    { mesh: portalHalo, baseOpacity: 0.3, phase: r() * Math.PI * 2, spin: 0.006 }
                 );
 
                 // Aurora ribbons in the sky
@@ -3341,16 +3344,16 @@
                             side: THREE.DoubleSide
                         })
                     );
-                    aurora.position.set((Math.random() - 0.5) * 10, 9 + i * 2, (Math.random() - 0.5) * 10);
-                    aurora.rotation.set(-0.3, Math.random() * Math.PI, 0);
+                    aurora.position.set((r() - 0.5) * 10, 9 + i * 2, (r() - 0.5) * 10);
+                    aurora.rotation.set(-0.3, r() * Math.PI, 0);
                     this.scene.add(aurora);
                     this.areaObjects.push(aurora);
                     this.astralAuroras.push({
                         mesh: aurora,
                         baseY: aurora.position.y,
-                        baseOpacity: 0.1 + Math.random() * 0.06,
-                        phase: Math.random() * Math.PI * 2,
-                        spin: 0.001 + Math.random() * 0.002
+                        baseOpacity: 0.1 + r() * 0.06,
+                        phase: r() * Math.PI * 2,
+                        spin: 0.001 + r() * 0.002
                     });
                 }
                 
