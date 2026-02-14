@@ -1692,19 +1692,21 @@
             }
 
             /* ── Caster Valley Tab — optimized mobile iframe ── */
-            #caster-valley-frame {
-                min-height: 400px !important;
-                height: calc(100vh - 160px) !important;
-                max-height: 70vh !important;
-                border-radius: 14px !important;
-                touch-action: auto !important;
-            }
+            @media (max-width: 768px) {
+                #caster-valley-frame {
+                    min-height: 400px !important;
+                    height: calc(100vh - 160px) !important;
+                    max-height: 70vh !important;
+                    border-radius: 14px !important;
+                    touch-action: auto !important;
+                }
 
-            #caster-valley-frame:fullscreen {
-                width: 100vw !important;
-                height: 100vh !important;
-                max-height: 100vh !important;
-                border-radius: 0 !important;
+                #caster-valley-frame:fullscreen {
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    max-height: 100vh !important;
+                    border-radius: 0 !important;
+                }
             }
 
             /* Caster Valley Mobile Header */
@@ -6834,7 +6836,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 miniplayer.style.display = 'flex';
                 miniplayer.style.pointerEvents = 'auto';
                 if (window._wtvLoadVideo) {
-                    window._wtvLoadVideo(false);
+                    window._wtvLoadVideo();
                 }
                 // Trigger fade-in animation
                 setTimeout(() => {
@@ -6846,9 +6848,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (introOverlay) {
                         introOverlay.classList.add('fade-out');
                     }
-                    if (window._wtvAutoPlay) {
-                        window._wtvAutoPlay();
-                    }
                 }, 600);
                 localStorage.removeItem('videoMiniplayerHidden');
                 setRestoreVisible(false);
@@ -6858,13 +6857,13 @@ document.addEventListener('DOMContentLoaded', () => {
             window._hideWtvMiniplayer = hideMiniplayer;
 
             // Load Google Drive video
-            function loadVideo(index, autoplay = false) {
+            function loadVideo(index) {
                 if (index >= 0 && index < googleDriveVideos.length) {
                     currentIndex = index;
                     const fileId = googleDriveVideos[currentIndex];
                     
                     // Build Google Drive embed URL
-                    const embedUrl = `https://drive.google.com/file/d/${fileId}/preview${autoplay ? '?autoplay=1' : ''}`;
+                    const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
                     
                     console.log(`🎬 Loading Google Drive video ${currentIndex + 1}/${googleDriveVideos.length}: ${videoTitles[currentIndex]}`);
                     
@@ -7085,22 +7084,14 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('🎬 WTV initialized - video loads on demand');
             
             // Add lazy-load video function
-            window._wtvLoadVideo = (autoplay = false) => {
+            window._wtvLoadVideo = () => {
                 if (!videoLoaded) {
                     console.log('🎬 Loading first WTV video...');
-                    loadVideo(0, autoplay);
+                    loadVideo(0);
                     videoLoaded = true;
                     return;
                 }
-                if (autoplay) {
-                    loadVideo(currentIndex, true);
-                }
-            };
-
-            window._wtvAutoPlay = () => {
-                if (window._wtvLoadVideo) {
-                    window._wtvLoadVideo(true);
-                }
+                loadVideo(currentIndex);
             };
             
             let videoLoaded = false;
@@ -7255,14 +7246,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (overlay) overlay.style.display = 'block';
                 if (mobileTab) mobileTab.style.display = 'none';
                 localStorage.removeItem('videoMiniplayerHidden');
-                if (window._wtvLoadVideo) window._wtvLoadVideo(false);
+                if (window._wtvLoadVideo) window._wtvLoadVideo();
                 // Fade out intro
                 setTimeout(() => {
                     const introOverlay = document.getElementById('wtv-intro-overlay');
                     if (introOverlay) {
                         introOverlay.classList.add('fade-out');
                     }
-                    if (window._wtvAutoPlay) window._wtvAutoPlay();
                 }, 600);
             };
 
