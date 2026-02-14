@@ -5462,17 +5462,29 @@ document.addEventListener('DOMContentLoaded', () => {
             background: linear-gradient(180deg, rgba(10, 10, 20, 0.6), rgba(0, 0, 0, 0.85));
             border-top: 1px solid rgba(251, 191, 36, 0.2);
         ">
+            <!-- Video Title -->
+            <div id="video-title" style="
+                font-size: 11px;
+                color: rgba(251, 191, 36, 0.95);
+                margin-bottom: 6px;
+                text-align: center;
+                font-family: 'Cinzel', serif;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                text-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
+            ">The Last Wizard</div>
+
             <!-- Playlist Info -->
             <div id="video-playlist-info" style="
-                font-size: 10px;
-                color: rgba(251, 191, 36, 0.85);
+                font-size: 9px;
+                color: rgba(251, 191, 36, 0.7);
                 margin-bottom: 10px;
                 text-align: center;
                 font-family: 'Inter', sans-serif;
-                font-weight: 700;
+                font-weight: 600;
                 letter-spacing: 0.3px;
                 text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-            ">1 / 5</div>
+            ">1 / 7</div>
 
             <!-- Control Buttons -->
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 7px;">
@@ -5571,13 +5583,25 @@ document.addEventListener('DOMContentLoaded', () => {
     <script>
         // Video Miniplayer Playlist & Controls
         (function() {
-            // Local video files - place your .mp4 files in a 'videos' folder
-            const videoPlaylist = [
-                'videos/sprout-magic.mp4',
-                'videos/a-wizard.mp4',
-                'videos/hear-the-drums.mp4',
-                'videos/keys-fall-slow.mp4',
-                'videos/caster.mp4'
+            // Google Drive video file IDs and titles
+            const googleDriveVideos = [
+                '16TQ9vT6-DBc4eBkNOEtispHbP29UxCuN',  // The Last Wizard
+                '16aRwSsYWfiUhvdpFTPZkqW7O7_FwdrNX',  // aWizard Magic
+                '1H9rR4Lx8_Cdr8QOTDA_gogSDT3zfjoDU',  // Sprout Magic
+                '1VO1AQ0Fs0UjXVcayQBi5sKg5yt6nvRsS',  // Hear The Drums in the Distance
+                '1G1ei4pCVrP6nJlIiBEWA63-S5sPurhRG',  // Keys Falls Slow Like Winter Rain
+                '14Wlka69GO-25-qv5lAFia0ctK8V2T7Sm',  // 🌱🧙‍♂️
+                '1TKn2oUN-OEjGdJfftmzNU0Jc2pJsQAXk'   // Astral Realm Caster
+            ];
+            
+            const videoTitles = [
+                'The Last Wizard',
+                'aWizard Magic',
+                'Sprout Magic',
+                'Hear The Drums in the Distance',
+                'Keys Falls Slow Like Winter Rain',
+                '🌱🧙‍♂️',
+                'Astral Realm Caster'
             ];
 
             let currentIndex = 0;
@@ -5590,41 +5614,42 @@ document.addEventListener('DOMContentLoaded', () => {
             const closeBtn = document.getElementById('close-miniplayer');
             const miniplayer = document.getElementById('video-miniplayer');
 
-            // Extract video URL from an NFT page URL
-            // Load video from local playlist
+            // Load Google Drive video
             function loadVideo(index) {
-                if (index >= 0 && index < videoPlaylist.length) {
+                if (index >= 0 && index < googleDriveVideos.length) {
                     currentIndex = index;
-                    const videoPath = videoPlaylist[currentIndex];
+                    const fileId = googleDriveVideos[currentIndex];
                     
-                    console.log(`🎬 Loading video ${currentIndex + 1}/${videoPlaylist.length}: ${videoPath}`);
+                    // Build Google Drive embed URL
+                    const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
                     
-                    // Always use video element for local files
-                    video.src = videoPath;
-                    video.style.display = 'block';
-                    iframe.style.display = 'none';
+                    console.log(`🎬 Loading Google Drive video ${currentIndex + 1}/${googleDriveVideos.length}: ${videoTitles[currentIndex]}`);
                     
-                    // Try to play (might be blocked by browser policy)
-                    video.play().catch(err => {
-                        console.log('ℹ️ Auto-play blocked - click play button');
-                        playPauseBtn.textContent = '▶️';
-                    });
+                    // Use iframe for Google Drive videos
+                    iframe.src = embedUrl;
+                    iframe.style.display = 'block';
+                    video.style.display = 'none';
                     
-                    playlistInfo.textContent = `${currentIndex + 1} / ${videoPlaylist.length}`;
+                    // Update title and playlist info
+                    const videoTitle = document.getElementById('video-title');
+                    if (videoTitle) {
+                        videoTitle.textContent = videoTitles[currentIndex];
+                    }
+                    playlistInfo.textContent = `${currentIndex + 1} / ${googleDriveVideos.length}`;
                 }
             }
 
             // Previous
             prevBtn.addEventListener('click', () => {
-                if (videoPlaylist.length > 0) {
-                    loadVideo((currentIndex - 1 + videoPlaylist.length) % videoPlaylist.length);
+                if (googleDriveVideos.length > 0) {
+                    loadVideo((currentIndex - 1 + googleDriveVideos.length) % googleDriveVideos.length);
                 }
             });
 
             // Next
             nextBtn.addEventListener('click', () => {
-                if (videoPlaylist.length > 0) {
-                    loadVideo((currentIndex + 1) % videoPlaylist.length);
+                if (googleDriveVideos.length > 0) {
+                    loadVideo((currentIndex + 1) % googleDriveVideos.length);
                 }
             });
 
