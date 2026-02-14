@@ -1630,8 +1630,8 @@
                 for (let i = 0; i < total; i++) {
                     const col = i % 4;
                     const row = Math.floor(i / 4);
-                    const x = (col - 1.5) * 4.2;
-                    const z = (row - Math.floor(total / 4) / 2) * 4.2;
+                    const x = (col - 1.5) * 4.5;
+                    const z = (row - Math.floor(total / 4) / 2) * 4.5;
                     plotPositions.push({ x, z });
                 }
                 const isNearPlot = (x, z, buffer = 1.6) =>
@@ -1746,10 +1746,25 @@
                     path: 'circle' // Drives in circle
                 };
                 
-                // Add 25 decorative trees scattered across ENTIRE map
-                for (let i = 0; i < 25; i++) {
-                    const x = (r() - 0.5) * 60; // -30 to 30
-                    const z = (r() - 0.5) * 60; // -30 to 30
+                const pickFarmOuterPos = (minRadius, maxRadius) => {
+                    let x, z;
+                    let tries = 0;
+                    do {
+                        const angle = r() * Math.PI * 2;
+                        const distance = minRadius + r() * (maxRadius - minRadius);
+                        x = Math.cos(angle) * distance + (r() - 0.5) * 2.5;
+                        z = Math.sin(angle) * distance + (r() - 0.5) * 2.5;
+                        tries += 1;
+                    } while ((Math.sqrt(x * x + z * z) < 10 || isNearPlot(x, z, 3.2)) && tries < 25);
+                    return { x, z };
+                };
+
+                // Add 32 decorative trees scattered across ENTIRE map, with outer bias
+                for (let i = 0; i < 32; i++) {
+                    const useOuter = r() < 0.7;
+                    const pos = useOuter ? pickFarmOuterPos(20, 30) : { x: (r() - 0.5) * 60, z: (r() - 0.5) * 60 };
+                    const x = pos.x;
+                    const z = pos.z;
                     
                     // Skip if too close to center farm plots
                     if (Math.sqrt(x * x + z * z) < 8 || isNearPlot(x, z, 3.2)) continue;
@@ -1829,6 +1844,49 @@
                     bush.scale.set(1, 0.6, 1);
                     this.scene.add(bush);
                     this.areaObjects.push(bush);
+                }
+
+                // Outer ring makeover: wildflower drift, stones, and shrubs
+                for (let i = 0; i < 70; i++) {
+                    const { x, z } = pickFarmOuterPos(22, 30);
+                    if (isNearPlot(x, z, 3.0)) continue;
+                    const flower = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.16 + r() * 0.1, 6, 6),
+                        new THREE.MeshLambertMaterial({
+                            color: [0xff6b6b, 0xffd93d, 0xffffff, 0xff69b4, 0x9d84b7][Math.floor(r() * 5)],
+                            emissive: [0xff6b6b, 0xffd93d, 0xffffff, 0xff69b4, 0x9d84b7][Math.floor(r() * 5)],
+                            emissiveIntensity: 0.25
+                        })
+                    );
+                    flower.position.set(x, 0.16, z);
+                    this.scene.add(flower);
+                    this.areaObjects.push(flower);
+                }
+
+                for (let i = 0; i < 30; i++) {
+                    const { x, z } = pickFarmOuterPos(22, 32);
+                    if (isNearPlot(x, z, 3.0)) continue;
+                    const rock = new THREE.Mesh(
+                        new THREE.DodecahedronGeometry(0.5 + r() * 0.5, 0),
+                        new THREE.MeshLambertMaterial({ color: 0x7b7b7b })
+                    );
+                    rock.position.set(x, 0.22, z);
+                    rock.rotation.set(r(), r(), r());
+                    this.scene.add(rock);
+                    this.areaObjects.push(rock);
+                }
+
+                for (let i = 0; i < 24; i++) {
+                    const { x, z } = pickFarmOuterPos(22, 32);
+                    if (isNearPlot(x, z, 3.0)) continue;
+                    const shrub = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.7 + r() * 0.4, 8, 8),
+                        new THREE.MeshLambertMaterial({ color: 0x2d5016 })
+                    );
+                    shrub.position.set(x, 0.35, z);
+                    shrub.scale.set(1, 0.6, 1);
+                    this.scene.add(shrub);
+                    this.areaObjects.push(shrub);
                 }
                 
                 // Golden hay bales (spread wider)
@@ -2327,6 +2385,30 @@
                 this.scene.background = new THREE.Color(0x2d5016);
                 const diffMult = this.getDifficultyMultiplier();
                 const r = () => this.seededRandom.next();
+                const clearingCenters = [];
+                for (let i = 0; i < 3; i++) {
+                    const angle = r() * Math.PI * 2;
+                    const distance = 12 + r() * 14;
+                    clearingCenters.push({
+                        x: Math.cos(angle) * distance,
+                        z: Math.sin(angle) * distance,
+                        radius: 4 + r() * 3
+                    });
+                }
+                const isInClearing = (x, z, pad = 0) =>
+                    clearingCenters.some(c => Math.hypot(x - c.x, z - c.z) < c.radius + pad);
+                const pickForestPos = (minRadius, maxRadius) => {
+                    let x, z;
+                    let tries = 0;
+                    do {
+                        const angle = r() * Math.PI * 2;
+                        const distance = minRadius + r() * (maxRadius - minRadius);
+                        x = Math.cos(angle) * distance + (r() - 0.5) * 2.5;
+                        z = Math.sin(angle) * distance + (r() - 0.5) * 2.5;
+                        tries += 1;
+                    } while ((Math.sqrt(x * x + z * z) < 8 || isInClearing(x, z, 0.6)) && tries < 30);
+                    return { x, z };
+                };
                 
                 // Dark forest ground
                 this.ground.material.color.setHex(0x2d5016);
@@ -2375,15 +2457,15 @@
                     this.areaObjects.push(leaf);
                 }
                 
-                // 50 Large pine trees scattered across FULL map
+                // 60 Large pine trees scattered across FULL map with clearings + outer bias
                 const treePositions = []; // Store tree positions for collision detection
-                for (let i = 0; i < 50; i++) {
-                    // Random position avoiding center area where trolls/dragon are
-                    let x, z;
-                    do {
-                        x = (r() - 0.5) * 60;
-                        z = (r() - 0.5) * 60;
-                    } while (Math.sqrt(x * x + z * z) < 8); // Keep center clear
+                for (let i = 0; i < 60; i++) {
+                    // Random position avoiding center area and clearings
+                    const useOuter = r() < 0.65;
+                    const pos = useOuter ? pickForestPos(18, 30) : pickForestPos(10, 26);
+                    const x = pos.x;
+                    const z = pos.z;
+                    if (isInClearing(x, z, 1.2)) continue;
                     
                     treePositions.push({ x, z }); // Store position
                     
@@ -2411,31 +2493,35 @@
                 }
                 this.forestTreePositions = treePositions; // Store for troll spawning
                 
-                // 100 Green bushes spread across map
-                for (let i = 0; i < 100; i++) {
+                // 120 Green bushes spread across map (outer bias)
+                for (let i = 0; i < 120; i++) {
+                    const useOuter = r() < 0.7;
+                    const pos = useOuter ? pickForestPos(18, 30) : pickForestPos(8, 24);
                     const bush = new THREE.Mesh(
                         new THREE.SphereGeometry(0.6 + r() * 0.3, 8, 8),
                         new THREE.MeshLambertMaterial({ color: 0x2d5016 })
                     );
                     bush.position.set(
-                        (r() - 0.5) * 60,
+                        pos.x,
                         0.3,
-                        (r() - 0.5) * 60
+                        pos.z
                     );
                     bush.scale.set(1, 0.6, 1);
                     this.scene.add(bush);
                     this.areaObjects.push(bush);
                 }
                 
-                // 15 Fallen logs across map
+                // 20 Fallen logs across map (outer bias)
                 const logGeo = new THREE.CylinderGeometry(0.3, 0.3, 3, 8);
                 const logMat = new THREE.MeshLambertMaterial({ color: 0x4a2511 });
-                for (let i = 0; i < 15; i++) {
+                for (let i = 0; i < 20; i++) {
+                    const useOuter = r() < 0.65;
+                    const pos = useOuter ? pickForestPos(18, 30) : pickForestPos(8, 22);
                     const log = new THREE.Mesh(logGeo, logMat);
                     log.position.set(
-                        (r() - 0.5) * 60,
+                        pos.x,
                         0.3,
-                        (r() - 0.5) * 60
+                        pos.z
                     );
                     log.rotation.z = Math.PI / 2;
                     log.rotation.y = r() * Math.PI;
@@ -2443,26 +2529,30 @@
                     this.areaObjects.push(log);
                 }
                 
-                // 40 Gray rocks scattered across map
-                for (let i = 0; i < 40; i++) {
+                // 55 Gray rocks scattered across map (outer bias)
+                for (let i = 0; i < 55; i++) {
+                    const useOuter = r() < 0.7;
+                    const pos = useOuter ? pickForestPos(18, 30) : pickForestPos(8, 24);
                     const rock = new THREE.Mesh(
                         new THREE.DodecahedronGeometry(0.4 + r() * 0.3, 0),
                         new THREE.MeshLambertMaterial({ color: 0x808080 })
                     );
                     rock.position.set(
-                        (r() - 0.5) * 60,
+                        pos.x,
                         0.3,
-                        (r() - 0.5) * 60
+                        pos.z
                     );
                     rock.rotation.set(r(), r(), r());
                     this.scene.add(rock);
                     this.areaObjects.push(rock);
                 }
                 
-                // 30 Mushrooms across forest
-                for (let i = 0; i < 30; i++) {
-                    const x = (r() - 0.5) * 60;
-                    const z = (r() - 0.5) * 60;
+                // 40 Mushrooms across forest (outer bias)
+                for (let i = 0; i < 40; i++) {
+                    const useOuter = r() < 0.65;
+                    const pos = useOuter ? pickForestPos(16, 28) : pickForestPos(8, 22);
+                    const x = pos.x;
+                    const z = pos.z;
                     
                     const stem = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.12, 0.15, 0.35, 8),
@@ -2484,15 +2574,16 @@
                     this.areaObjects.push(cap);
                 }
                 
-                // 20 Gray rocks randomly scattered
+                // 26 Gray rocks randomly scattered
                 const rockGeo = new THREE.DodecahedronGeometry(0.5, 0);
                 const rockMat = new THREE.MeshLambertMaterial({ color: 0x808080 });
-                for (let i = 0; i < 20; i++) {
+                for (let i = 0; i < 26; i++) {
+                    const pos = pickForestPos(10, 30);
                     const rock = new THREE.Mesh(rockGeo, rockMat);
                     rock.position.set(
-                        (r() - 0.5) * 40,
+                        pos.x,
                         0.25,
-                        (r() - 0.5) * 40
+                        pos.z
                     );
                     rock.rotation.set(r(), r(), r());
                     rock.scale.set(0.8 + r() * 0.4, 0.8 + r() * 0.4, 0.8 + r() * 0.4);
@@ -2754,7 +2845,7 @@
                         if (this.forestTreePositions) {
                             for (const tree of this.forestTreePositions) {
                                 const treeDist = Math.sqrt((x - tree.x) ** 2 + (z - tree.z) ** 2);
-                                if (treeDist < 3) { // Min 3 units from any tree
+                                if (treeDist < 6) { // Min 6 units from any tree
                                     tooCloseToTree = true;
                                     break;
                                 }
@@ -2865,6 +2956,14 @@
             createFishing() {
                 this.scene.background = new THREE.Color(0x87cefd);
                 const r = () => this.seededRandom.next();
+                const pickBeachPos = (minRadius, maxRadius, jitter = 2) => {
+                    const angle = r() * Math.PI * 2;
+                    const distance = minRadius + r() * (maxRadius - minRadius);
+                    return {
+                        x: Math.cos(angle) * distance + (r() - 0.5) * jitter,
+                        z: Math.sin(angle) * distance + (r() - 0.5) * jitter
+                    };
+                };
                 
                 // Update ground to ocean blue
                 this.ground.material.color.setHex(0x1e90ff);
@@ -2918,27 +3017,35 @@
                 this.scene.add(beach);
                 this.areaObjects.push(beach);
                 
-                // Reduced sand patches for cleaner look
-                for (let i = 0; i < 80; i++) {
-                    const angle = r() * Math.PI * 2;
-                    const distance = 14 + r() * 28;
-                    const x = Math.cos(angle) * distance + (r() - 0.5) * 4;
-                    const z = Math.sin(angle) * distance + (r() - 0.5) * 4;
-                    const sandPatch = new THREE.Mesh(
-                        new THREE.CircleGeometry(0.8 + r() * 1.5, 8),
-                        new THREE.MeshLambertMaterial({ 
-                            color: [0xedd9a8, 0xf4a460, 0xdeb887][Math.floor(r() * 3)],
+                // Subtle dune streaks instead of bright circular patches
+                for (let i = 0; i < 35; i++) {
+                    const pos = pickBeachPos(16, 36, 3.5);
+                    const dune = new THREE.Mesh(
+                        new THREE.CircleGeometry(0.9 + r() * 1.2, 10),
+                        new THREE.MeshLambertMaterial({
+                            color: [0xe6cfa0, 0xe0c090, 0xd8b98a][Math.floor(r() * 3)],
                             transparent: true,
-                            opacity: 0.6,
+                            opacity: 0.35,
                             depthWrite: false
                         })
                     );
-                    sandPatch.position.set(x, 0.085 + i * 0.00005, z);
-                    sandPatch.rotation.x = -Math.PI / 2;
-                    sandPatch.rotation.z = r() * Math.PI;
-                    this.scene.add(sandPatch);
-                    this.areaObjects.push(sandPatch);
+                    dune.position.set(pos.x, 0.085 + i * 0.00004, pos.z);
+                    dune.rotation.x = -Math.PI / 2;
+                    dune.rotation.z = r() * Math.PI;
+                    dune.scale.set(1.8, 1, 0.6);
+                    this.scene.add(dune);
+                    this.areaObjects.push(dune);
                 }
+
+                // Wet sand ring near the inner water edge
+                const wetSand = new THREE.Mesh(
+                    new THREE.RingGeometry(13.2, 16.2, 64),
+                    new THREE.MeshLambertMaterial({ color: 0xd7c6a3, transparent: true, opacity: 0.45, depthWrite: false })
+                );
+                wetSand.rotation.x = -Math.PI / 2;
+                wetSand.position.y = 0.082;
+                this.scene.add(wetSand);
+                this.areaObjects.push(wetSand);
                 
                 // Add minimal sandy peninsulas
                 for (let i = 0; i < 4; i++) {
@@ -2959,11 +3066,11 @@
                     }
                 }
                 
-                // Reduced palm trees for cleaner look
-                const numPalms = 20;
+                // Palm trees with more outer coverage
+                const numPalms = 26;
                 for (let i = 0; i < numPalms; i++) {
                     const angle = (i / numPalms) * Math.PI * 2 + (r() - 0.5) * 0.8;
-                    const distance = 18 + r() * 15;
+                    const distance = 22 + r() * 16;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     
@@ -2996,12 +3103,11 @@
                     }
                 }
                 
-                // Reduced coconuts
-                for (let i = 0; i < 20; i++) {
-                    const angle = r() * Math.PI * 2;
-                    const distance = 16 + r() * 18;
-                    const x = Math.cos(angle) * distance;
-                    const z = Math.sin(angle) * distance;
+                // Coconuts with outer bias
+                for (let i = 0; i < 28; i++) {
+                    const pos = pickBeachPos(20, 36, 2.5);
+                    const x = pos.x;
+                    const z = pos.z;
                     const coconut = new THREE.Mesh(
                         new THREE.SphereGeometry(0.3, 8, 8),
                         new THREE.MeshLambertMaterial({ color: 0x8b4513 })
@@ -3013,11 +3119,10 @@
 
                 // Extra beach clutter: shells
                 const shellColors = [0xfff1d0, 0xf4e1b6, 0xffd6a0];
-                for (let i = 0; i < 18; i++) {
-                    const angle = r() * Math.PI * 2;
-                    const distance = 16 + r() * 18;
-                    const x = Math.cos(angle) * distance + (r() - 0.5) * 1.2;
-                    const z = Math.sin(angle) * distance + (r() - 0.5) * 1.2;
+                for (let i = 0; i < 24; i++) {
+                    const pos = pickBeachPos(18, 36, 1.8);
+                    const x = pos.x;
+                    const z = pos.z;
                     const shell = new THREE.Mesh(
                         new THREE.SphereGeometry(0.18 + r() * 0.12, 8, 8),
                         new THREE.MeshLambertMaterial({ color: shellColors[Math.floor(r() * shellColors.length)] })
@@ -3031,11 +3136,10 @@
 
                 // Extra beach clutter: starfish
                 const starMat = new THREE.MeshLambertMaterial({ color: 0xff8c42, emissive: 0xd97706, emissiveIntensity: 0.2 });
-                for (let i = 0; i < 10; i++) {
-                    const angle = r() * Math.PI * 2;
-                    const distance = 17 + r() * 16;
-                    const x = Math.cos(angle) * distance + (r() - 0.5) * 1.0;
-                    const z = Math.sin(angle) * distance + (r() - 0.5) * 1.0;
+                for (let i = 0; i < 14; i++) {
+                    const pos = pickBeachPos(18, 36, 1.2);
+                    const x = pos.x;
+                    const z = pos.z;
                     const starGroup = new THREE.Group();
                     for (let j = 0; j < 5; j++) {
                         const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.1, 0.6, 5), starMat);
@@ -3052,11 +3156,10 @@
                 }
 
                 // Extra beach clutter: driftwood
-                for (let i = 0; i < 8; i++) {
-                    const angle = r() * Math.PI * 2;
-                    const distance = 15 + r() * 12;
-                    const x = Math.cos(angle) * distance;
-                    const z = Math.sin(angle) * distance;
+                for (let i = 0; i < 12; i++) {
+                    const pos = pickBeachPos(18, 36, 1.0);
+                    const x = pos.x;
+                    const z = pos.z;
                     const driftwood = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.12, 0.18, 1.4 + r() * 1.4, 8),
                         new THREE.MeshLambertMaterial({ color: 0x7a4a2a })
@@ -3069,11 +3172,10 @@
                 }
 
                 // Beach grass tufts
-                for (let i = 0; i < 24; i++) {
-                    const angle = r() * Math.PI * 2;
-                    const distance = 18 + r() * 18;
-                    const x = Math.cos(angle) * distance + (r() - 0.5) * 1.6;
-                    const z = Math.sin(angle) * distance + (r() - 0.5) * 1.6;
+                for (let i = 0; i < 32; i++) {
+                    const pos = pickBeachPos(20, 36, 1.8);
+                    const x = pos.x;
+                    const z = pos.z;
                     const tuft = new THREE.Mesh(
                         new THREE.ConeGeometry(0.14, 0.4, 6),
                         new THREE.MeshLambertMaterial({ color: 0x5a7647 })
@@ -3101,9 +3203,10 @@
                 }
                 
                 // Minimal beach rocks
-                for (let i = 0; i < 15; i++) {
-                    const angle = (i / 15) * Math.PI * 2;
-                    const distance = 14 + r() * 3;
+                const beachRockCount = 22;
+                for (let i = 0; i < beachRockCount; i++) {
+                    const angle = (i / beachRockCount) * Math.PI * 2;
+                    const distance = 18 + r() * 14;
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
                     const rock = new THREE.Mesh(
@@ -4096,7 +4199,7 @@
                 }
                 
                 plantGroup.position.set(plot.x, 0.6, plot.z);
-                plantGroup.scale.set(0.8, 0.8, 0.8); // Start visible
+                plantGroup.scale.set(1.0, 1.0, 1.0); // Start clearly visible
                 plantGroup.castShadow = true;
                 this.scene.add(plantGroup);
                 this.areaObjects.push(plantGroup);
@@ -5004,12 +5107,13 @@
                         if (plot.seed && plot.plantMesh) {
                             plot.growthTime += 100 * speedMult * (1 + this.plantSpeed);
                             const progress = Math.min(plot.growthTime / plot.growthNeeded, 1);
-                            // Bigger final size: 0.3 + progress * 1.2 → 0.4 + progress * 2.0
-                            const targetScale = 0.6 + progress * 2.8; // Grows from 0.6 to 3.4 - much bigger!
+                            const minScale = 1.0;
+                            const targetScale = minScale + progress * 2.4; // Grows from 1.0 to 3.4
                             // Smooth scale interpolation
                             const currentScale = plot.plantMesh.scale.x;
                             const newScale = currentScale + (targetScale - currentScale) * 0.1;
-                            plot.plantMesh.scale.set(newScale, newScale, newScale);
+                            const clampedScale = Math.max(minScale, newScale);
+                            plot.plantMesh.scale.set(clampedScale, clampedScale, clampedScale);
                             // Keep plants grounded at their planted Y position
                             const baseY = 0.6;
                             const tier = plot.plantMesh.userData?.tier || 1;
