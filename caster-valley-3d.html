@@ -1698,18 +1698,47 @@
                 }
                 
                 // Red barn with roof (moved further out)
-                const barn = new THREE.Mesh(new THREE.BoxGeometry(3, 2.5, 2.5), new THREE.MeshLambertMaterial({ color: 0x8b0000 }));
-                barn.position.set(15, 1.25, -12); // Moved from (9, 1.25, -9)
+                const barnPos = { x: 15, z: -12 };
+                const barn = new THREE.Mesh(new THREE.BoxGeometry(3.6, 3.0, 3.0), new THREE.MeshLambertMaterial({ color: 0x8b0000 }));
+                barn.position.set(barnPos.x, 1.5, barnPos.z); // Moved from (9, 1.25, -9)
                 barn.castShadow = true;
                 this.scene.add(barn);
                 this.areaObjects.push(barn);
                 
-                const barnRoof = new THREE.Mesh(new THREE.ConeGeometry(2.2, 1.5, 4), new THREE.MeshLambertMaterial({ color: 0x6d0000 }));
-                barnRoof.position.set(15, 3.25, -12); // Moved to match barn
+                const barnRoof = new THREE.Mesh(new THREE.ConeGeometry(2.6, 1.7, 4), new THREE.MeshLambertMaterial({ color: 0x6d0000 }));
+                barnRoof.position.set(barnPos.x, 4.0, barnPos.z); // Moved to match barn
                 barnRoof.rotation.y = Math.PI / 4;
                 barnRoof.castShadow = true;
                 this.scene.add(barnRoof);
                 this.areaObjects.push(barnRoof);
+
+                const barnDoor = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.2, 1.6, 0.08),
+                    new THREE.MeshLambertMaterial({ color: 0x5a2b12 })
+                );
+                barnDoor.position.set(barnPos.x, 0.9, barnPos.z + 1.54);
+                this.scene.add(barnDoor);
+                this.areaObjects.push(barnDoor);
+
+                const barnWindowMat = new THREE.MeshLambertMaterial({ color: 0xffd28a, emissive: 0xffb347, emissiveIntensity: 0.6 });
+                const barnWindowLeft = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.05), barnWindowMat);
+                barnWindowLeft.position.set(barnPos.x - 0.9, 2.0, barnPos.z + 1.52);
+                this.scene.add(barnWindowLeft);
+                this.areaObjects.push(barnWindowLeft);
+
+                const barnWindowRight = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.05), barnWindowMat);
+                barnWindowRight.position.set(barnPos.x + 0.9, 2.0, barnPos.z + 1.52);
+                this.scene.add(barnWindowRight);
+                this.areaObjects.push(barnWindowRight);
+
+                const barnChimney = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.4, 1.0, 0.4),
+                    new THREE.MeshLambertMaterial({ color: 0x4a2a1a })
+                );
+                barnChimney.position.set(barnPos.x + 1.1, 4.4, barnPos.z - 0.4);
+                barnChimney.castShadow = true;
+                this.scene.add(barnChimney);
+                this.areaObjects.push(barnChimney);
                 
                 // Green tractor (starts at left, will drive around)
                 const tractorBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1.8), new THREE.MeshLambertMaterial({ color: 0x2e7d32 }));
@@ -1768,6 +1797,7 @@
                     
                     // Skip if too close to center farm plots
                     if (Math.sqrt(x * x + z * z) < 8 || isNearPlot(x, z, 3.2)) continue;
+                    if (Math.hypot(x - barnPos.x, z - barnPos.z) < 6.5) continue;
                     
                     const trunk = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.3, 0.4, 3 + r(), 8),
@@ -2114,7 +2144,7 @@
                     const height = 8 + r() * 4;
                     
                     const wall = new THREE.Mesh(
-                        new THREE.BoxGeometry(width, height, 3 + r()),
+                        new THREE.BoxGeometry(width, height, 1.6 + r() * 0.5),
                         wallMat
                     );
                     
@@ -2173,7 +2203,7 @@
                 // 60 Stalactites hanging from ceiling across ENTIRE cave floor
                 const stalactiteGeo = new THREE.ConeGeometry(0.3, 2, 8);
                 const stalactiteMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
-                for (let i = 0; i < 60; i++) {
+                for (let i = 0; i < 40; i++) {
                     const stalactite = new THREE.Mesh(stalactiteGeo, stalactiteMat);
                     stalactite.position.set(
                         (r() - 0.5) * 60,
@@ -2189,7 +2219,7 @@
                 // 50 Stalagmites rising from ground across ENTIRE cave floor
                 const stalagmiteGeo = new THREE.ConeGeometry(0.35, 2.5, 8);
                 const stalagmiteMat = new THREE.MeshLambertMaterial({ color: 0x757575 });
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 35; i++) {
                     const stalagmite = new THREE.Mesh(stalagmiteGeo, stalagmiteMat);
                     stalagmite.position.set(
                         (r() - 0.5) * 60,
@@ -2203,7 +2233,7 @@
                 }
                 
                 // 15 Column formations spread across ENTIRE mine floor
-                for (let i = 0; i < 15; i++) {
+                for (let i = 0; i < 10; i++) {
                     const x = (r() - 0.5) * 55;
                     const z = (r() - 0.5) * 55;
                     const column = new THREE.Mesh(
@@ -2217,7 +2247,7 @@
                 }
                 
                 // 20 Mine carts spread randomly across ENTIRE mine
-                for (let i = 0; i < 20; i++) {
+                for (let i = 0; i < 12; i++) {
                     const cartX = (r() - 0.5) * 55;
                     const cartZ = (r() - 0.5) * 55;
                     const cartBody = new THREE.Mesh(
@@ -2240,7 +2270,7 @@
                 }
                 
                 // 35 Pickaxes scattered across ENTIRE mine
-                for (let i = 0; i < 35; i++) {
+                for (let i = 0; i < 20; i++) {
                     const px = (r() - 0.5) * 55;
                     const pz = (r() - 0.5) * 55;
                     const handle = new THREE.Mesh(
@@ -2262,7 +2292,7 @@
                 }
                 
                 // 40 Glowing lanterns scattered throughout mine
-                for (let i = 0; i < 40; i++) {
+                for (let i = 0; i < 24; i++) {
                     const x = (r() - 0.5) * 55;
                     const z = (r() - 0.5) * 55;
                     const lantern = new THREE.Mesh(
@@ -2286,7 +2316,7 @@
                 // 50 Boulder piles scattered across mine
                 const boulderGeo = new THREE.SphereGeometry(0.8, 8, 8);
                 const boulderMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 30; i++) {
                     const x = (r() - 0.5) * 55;
                     const z = (r() - 0.5) * 55;
                     for (let j = 0; j < 2; j++) {
