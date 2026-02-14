@@ -3091,7 +3091,7 @@
                         id="caster-valley-frame"
                         title="Caster Valley 3D"
                         src="about:blank"
-                        data-src="/caster-valley-3d.html"
+                        data-src="caster-valley-3d.html"
                         style="
                             width: 100%;
                             height: 70vh;
@@ -5191,6 +5191,13 @@ function updateEmojiMarket(chiaTokens, baseTokens) {
                         // Load treasury - cache loads instantly, fresh data in background
                         setTimeout(loadComprehensiveTreasury, 200);
                     }
+                    if (activeTab === 'valley') {
+                        const frame = document.getElementById('caster-valley-frame');
+                        if (frame && !frame.dataset.loaded) {
+                            frame.src = frame.dataset.src;
+                            frame.dataset.loaded = 'true';
+                        }
+                    }
                 }
             })();
             // ────────────────────────────────────────────────────────────────
@@ -6826,6 +6833,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const showMiniplayer = () => {
                 miniplayer.style.display = 'flex';
                 miniplayer.style.pointerEvents = 'auto';
+                if (window._wtvLoadVideo) {
+                    window._wtvLoadVideo(false);
+                }
                 // Trigger fade-in animation
                 setTimeout(() => {
                     miniplayer.classList.add('show-wtv');
@@ -7245,6 +7255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (overlay) overlay.style.display = 'block';
                 if (mobileTab) mobileTab.style.display = 'none';
                 localStorage.removeItem('videoMiniplayerHidden');
+                if (window._wtvLoadVideo) window._wtvLoadVideo(false);
                 // Fade out intro
                 setTimeout(() => {
                     const introOverlay = document.getElementById('wtv-intro-overlay');
