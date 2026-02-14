@@ -5537,23 +5537,41 @@
                 // Try multiple fullscreen APIs for maximum mobile compatibility
                 if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
                     // Request fullscreen
-                    const requestFullscreen = container.requestFullscreen 
-                        || container.webkitRequestFullscreen 
-                        || container.mozRequestFullScreen 
-                        || container.msRequestFullscreen;
-                    
-                    if (requestFullscreen) {
-                        requestFullscreen.call(container, { navigationUI: 'hide' }).catch(() => {});
+                    if (container.requestFullscreen) {
+                        container.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+                        return;
+                    }
+                    if (container.webkitRequestFullscreen) {
+                        try {
+                            container.webkitRequestFullscreen();
+                        } catch (e) {
+                            container.webkitRequestFullscreen && container.webkitRequestFullscreen();
+                        }
+                        return;
+                    }
+                    if (container.mozRequestFullScreen) {
+                        container.mozRequestFullScreen();
+                        return;
+                    }
+                    if (container.msRequestFullscreen) {
+                        container.msRequestFullscreen();
                     }
                 } else {
                     // Exit fullscreen
-                    const exitFullscreen = document.exitFullscreen 
-                        || document.webkitExitFullscreen 
-                        || document.mozCancelFullScreen 
-                        || document.msExitFullscreen;
-                    
-                    if (exitFullscreen) {
-                        exitFullscreen.call(document);
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                        return;
+                    }
+                    if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                        return;
+                    }
+                    if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                        return;
+                    }
+                    if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
                     }
                 }
             },
