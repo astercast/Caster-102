@@ -2267,12 +2267,21 @@
             console.log(`Fetching circulating supply for ${tokensNeedingSupply.length} CATs...`);
             const supplyPromises = tokensNeedingSupply.map(async (t) => {
                 try {
-                    const d = await spacescanFetch(`https://api.spacescan.io/cat/info/${t.assetId}`, 8000, 1);
-                    if (d?.data) {
-                        const circ = parseFloat(d.data.circulating_supply || 0);
-                        const price = parseFloat(d.data.amount_price || 0);
-                        const change = parseFloat(d.data.pricepercentage || 0);
-                        return { assetId: t.assetId, circ, price, change };
+                    // Use proxy to avoid CORS
+                    const proxyUrl = `/api/spacescan-proxy?path=${encodeURIComponent(`cat/info/${t.assetId}`)}`;
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    const response = await fetch(proxyUrl, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        const d = await response.json();
+                        if (d?.data) {
+                            const circ = parseFloat(d.data.circulating_supply || 0);
+                            const price = parseFloat(d.data.amount_price || 0);
+                            const change = parseFloat(d.data.pricepercentage || 0);
+                            return { assetId: t.assetId, circ, price, change };
+                        }
                     }
                 } catch(e) {
                     console.warn(`⚠️ Supply fetch failed for ${t.assetId.slice(0, 8)}...`);
@@ -4487,9 +4496,25 @@ async function loadComprehensiveTreasury(force = false) {
                 }
 
                 const fetchSpacescanWithFallback = async (endpoint, wallet, timeout) => {
-                    // Direct calls only (proxy disabled by design)
-                    const direct = await spacescanFetch(`https://api.spacescan.io/address/${endpoint}/${wallet}`, timeout);
-                    return direct || null;
+                    // Use proxy to bypass CORS (direct browser calls blocked by Spacescan)
+                    const path = `address/${endpoint}/${wallet}`;
+                    const proxyUrl = `/api/spacescan-proxy?path=${encodeURIComponent(path)}`;
+                    
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), timeout || 20000);
+                        const response = await fetch(proxyUrl, { signal: controller.signal });
+                        clearTimeout(timeoutId);
+                        
+                        if (response.ok) {
+                            return await response.json();
+                        }
+                        console.warn(`Proxy returned ${response.status} for ${path}`);
+                        return null;
+                    } catch(e) {
+                        console.warn(`Proxy fetch error for ${path}:`, e.message);
+                        return null;
+                    }
                 };
 
                 // Load per-wallet cache for progressive display
