@@ -1707,6 +1707,26 @@
                 border-radius: 0 !important;
             }
 
+            /* Caster Valley Mobile Header */
+            @media (max-width: 768px) {
+                .valley-mobile-header {
+                    display: block !important;
+                }
+                
+                #valley-header h2 {
+                    font-size: 18px !important;
+                    margin-bottom: 8px !important;
+                }
+                
+                #valley-close-btn {
+                    display: none !important;
+                }
+                
+                #valley-close-btn.visible {
+                    display: flex !important;
+                }
+            }
+
             /* Wrapper around valley iframe */
             #valley > div > div {
                 border-radius: 14px !important;
@@ -3022,6 +3042,44 @@
                 margin: 0 auto;
                 padding: 16px;
             ">
+                <!-- Mobile Title and Close Button -->
+                <div id="valley-header" style="
+                    display: none;
+                    margin-bottom: 12px;
+                    position: relative;
+                " class="valley-mobile-header">
+                    <h2 style="
+                        text-align: center;
+                        color: rgba(251, 191, 36, 0.95);
+                        font-family: 'Space Grotesk', sans-serif;
+                        font-size: 24px;
+                        font-weight: 700;
+                        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+                        margin: 0;
+                        letter-spacing: 1px;
+                    ">🧙 Caster Valley</h2>
+                    <button id="valley-close-btn" style="
+                        display: none;
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        background: rgba(201, 86, 44, 0.9);
+                        border: 2px solid #fbbf24;
+                        color: #fef6e4;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 18px;
+                        font-weight: bold;
+                        padding: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s ease;
+                        z-index: 1001;
+                    " onclick="document.getElementById('caster-valley-frame').requestFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen && document.webkitExitFullscreen()">×</button>
+                </div>
                 <div style="
                     border: 2px solid rgba(251, 191, 36, 0.4);
                     border-radius: 16px;
@@ -7262,6 +7320,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         })();
+    </script>
+
+    <!-- Fullscreen and Mobile Enhancements -->
+    <script>
+        // Handle fullscreen button and close button visibility
+        const closeBtn = document.getElementById('valley-close-btn');
+        const frame = document.getElementById('caster-valley-frame');
+        
+        // Prevent scrolling on the main page during fullscreen
+        function toggleScrollLock(lock) {
+            if (lock) {
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.width = '100%';
+                document.body.style.height = '100%';
+                window.scrollTo(0, 0);
+            } else {
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.width = '';
+                document.body.style.height = '';
+            }
+        }
+        
+        // Check fullscreen state and update button visibility
+        function updateFullscreenUI() {
+            const isFullscreen = !!(document.fullscreenElement || 
+                                   document.webkitFullscreenElement || 
+                                   document.mozFullScreenElement ||
+                                   document.msFullscreenElement);
+            
+            if (isFullscreen) {
+                closeBtn.classList.add('visible');
+                toggleScrollLock(true);
+                // Prevent pull-to-refresh on iOS
+                document.addEventListener('touchmove', preventPullRefresh, { passive: false });
+            } else {
+                closeBtn.classList.remove('visible');
+                toggleScrollLock(false);
+                document.removeEventListener('touchmove', preventPullRefresh);
+            }
+        }
+        
+        // Prevent pull-to-refresh and scrolling on iOS
+        function preventPullRefresh(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+            const scrollTop = window.scrollY;
+            if (scrollTop === 0) {
+                e.preventDefault();
+            }
+        }
+        
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', updateFullscreenUI);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+        document.addEventListener('mozfullscreenchange', updateFullscreenUI);
+        document.addEventListener('MSFullscreenChange', updateFullscreenUI);
+        
+        // Also listen for iframe requests to exit fullscreen
+        if (frame) {
+            frame.addEventListener('mouseenter', () => {
+                setTimeout(updateFullscreenUI, 100);
+            });
+        }
     </script>
 
 </body>
