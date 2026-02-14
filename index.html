@@ -5871,34 +5871,48 @@ document.addEventListener('DOMContentLoaded', () => {
         })();
     </script>
 
-    <!-- WTV Restore Button -->
+    <!-- WTV Restore Button - More Visible -->
     <button id="wtv-restore-btn" style="
         position: fixed;
         bottom: 20px;
         left: 20px;
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(135deg, rgba(251, 191, 36, 0.4), rgba(220, 38, 38, 0.2));
-        border: 2px solid rgba(251, 191, 36, 0.7);
-        border-radius: 10px;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.8), rgba(220, 38, 38, 0.4));
+        border: 3px solid rgba(251, 191, 36, 1);
+        border-radius: 15px;
         color: #fbbf24;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: 900;
         cursor: pointer;
         z-index: 999998;
         display: none;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         transition: all 0.3s;
-        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), inset 0 0 15px rgba(251, 191, 36, 0.2);
         font-family: 'Cinzel', serif;
         text-align: center;
-        line-height: 1;
-        padding: 4px;
-    " onmouseover="this.style.background='linear-gradient(135deg, rgba(251,191,36,0.6), rgba(220,38,38,0.4))'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 16px rgba(251,191,36,0.5)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(251,191,36,0.4), rgba(220,38,38,0.2))'; this.style.transform=''; this.style.boxShadow='0 4px 12px rgba(251,191,36,0.3)';"
-        title="Show WTV">
-        🎬 WTV
+        line-height: 1.2;
+        gap: 4px;
+        animation: wtv-pulse 2s infinite;
+    " onmouseover="this.style.background='linear-gradient(135deg, rgba(251,191,36,1), rgba(220,38,38,0.6))'; this.style.transform='scale(1.15)'; this.style.boxShadow='0 0 35px rgba(251,191,36,0.85), inset 0 0 20px rgba(251,191,36,0.4)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(251,191,36,0.8), rgba(220,38,38,0.4))'; this.style.transform=''; this.style.boxShadow='0 0 25px rgba(251,191,36,0.6), inset 0 0 15px rgba(251,191,36,0.2)';"
+        title="Click to restore WTV miniplayer">
+        <span style="font-size: 28px;">🎬</span>
+        <span style="font-size: 10px; opacity: 0.9;">WTV</span>
     </button>
+
+    <style>
+        @keyframes wtv-pulse {
+            0%, 100% {
+                box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), inset 0 0 15px rgba(251, 191, 36, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(251, 191, 36, 0.9), inset 0 0 20px rgba(251, 191, 36, 0.4);
+            }
+        }
+    </style>
 
 </body>
 
