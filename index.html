@@ -1686,15 +1686,25 @@
 
             /* ── Caster Valley Tab — optimized mobile iframe ── */
             #caster-valley-frame {
-                min-height: 500px !important;
-                height: 60vh !important;
+                min-height: 400px !important;
+                height: calc(100vh - 160px) !important;
+                max-height: 70vh !important;
                 border-radius: 14px !important;
+                touch-action: auto !important;
+            }
+
+            #caster-valley-frame:fullscreen {
+                width: 100vw !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
             }
 
             /* Wrapper around valley iframe */
             #valley > div > div {
                 border-radius: 14px !important;
-                overflow: hidden !important;
+                overflow: visible !important;
+                position: relative !important;
             }
 
             /* ── Footer — clean & minimal ── */
@@ -1920,8 +1930,15 @@
             }
 
             #caster-valley-frame {
-                min-height: 350px !important;
-                height: 50vh !important;
+                min-height: 300px !important;
+                height: calc(100vh - 140px) !important;
+                max-height: 60vh !important;
+            }
+
+            #caster-valley-frame:fullscreen {
+                width: 100vw !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
             }
 
             .footer p {
@@ -2991,8 +3008,10 @@
                             display: block;
                             background: #000;
                         "
-                        allow="fullscreen; autoplay; clipboard-read; clipboard-write"
+                        allow="fullscreen; autoplay; clipboard-read; clipboard-write; accelerometer; gyroscope"
                         allowfullscreen
+                        webkitallowfullscreen
+                        mozallowfullscreen
                     ></iframe>
                 
                 </div>
@@ -3093,6 +3112,58 @@
                 if (frame && !frame.dataset.loaded) {
                     frame.src = frame.dataset.src;
                     frame.dataset.loaded = 'true';
+                    
+                    // Enable mobile fullscreen support
+                    if (window.innerWidth <= 768) {
+                        setTimeout(() => {
+                            try {
+                                const iframeDoc = frame.contentDocument || frame.contentWindow.document;
+                                if (iframeDoc && iframeDoc.body) {
+                                    // Inject mobile fullscreen handler into iframe
+                                    const script = iframeDoc.createElement('script');
+                                    script.textContent = `
+                                        (function() {
+                                            // Override toggleFullscreen to fullscreen the iframe instead
+                                            const checkGame = setInterval(() => {
+                                                if (window.game && typeof window.game.toggleFullscreen === 'function') {
+                                                    clearInterval(checkGame);
+                                                    const originalToggle = window.game.toggleFullscreen.bind(window.game);
+                                                    window.game.toggleFullscreen = function() {
+                                                        const iframe = window.frameElement;
+                                                        if (!iframe) {
+                                                            originalToggle();
+                                                            return;
+                                                        }
+                                                        if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+                                                            if (iframe.requestFullscreen) {
+                                                                iframe.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+                                                            } else if (iframe.webkitRequestFullscreen) {
+                                                                iframe.webkitRequestFullscreen();
+                                                            } else if (iframe.mozRequestFullScreen) {
+                                                                iframe.mozRequestFullScreen();
+                                                            }
+                                                        } else {
+                                                            if (document.exitFullscreen) {
+                                                                document.exitFullscreen();
+                                                            } else if (document.webkitExitFullscreen) {
+                                                                document.webkitExitFullscreen();
+                                                            } else if (document.mozCancelFullScreen) {
+                                                                document.mozCancelFullScreen();
+                                                            }
+                                                        }
+                                                    };
+                                                }
+                                            }, 500);
+                                            setTimeout(() => clearInterval(checkGame), 10000);
+                                        })();
+                                    `;
+                                    iframeDoc.head.appendChild(script);
+                                }
+                            } catch (e) {
+                                console.log('Could not inject fullscreen script:', e);
+                            }
+                        }, 1500);
+                    }
                 }
             }
         }
