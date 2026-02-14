@@ -1044,8 +1044,8 @@
             panDamping: 0.74,
             panMaxSpeed: 1.0,
             panVelocity: { x: 0, z: 0 },
-            maxPanX: 25,
-            maxPanZ: 25,
+            maxPanX: 20,
+            maxPanZ: 20,
             isRecentering: false,
             zoom: 1.0,
             minZoom: 0.5,
@@ -1313,9 +1313,9 @@
                     const rainCount = 500;
                     const positions = new Float32Array(rainCount * 3);
                     for (let i = 0; i < rainCount; i++) {
-                        positions[i * 3] = (Math.random() - 0.5) * 50;
+                        positions[i * 3] = (Math.random() - 0.5) * 40;
                         positions[i * 3 + 1] = Math.random() * 30 + 10;
-                        positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+                        positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
                     }
                     rainGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                     const rain = new THREE.Points(rainGeo, new THREE.PointsMaterial({ color: 0x87ceeb, size: 0.1, transparent: true, opacity: 0.6 }));
@@ -1326,9 +1326,9 @@
                     const snowCount = 300;
                     const positions = new Float32Array(snowCount * 3);
                     for (let i = 0; i < snowCount; i++) {
-                        positions[i * 3] = (Math.random() - 0.5) * 50;
+                        positions[i * 3] = (Math.random() - 0.5) * 40;
                         positions[i * 3 + 1] = Math.random() * 30 + 10;
-                        positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+                        positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
                     }
                     snowGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                     const snow = new THREE.Points(snowGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.2, transparent: true, opacity: 0.8 }));
@@ -1373,7 +1373,7 @@
                 this.scene.add(sunLight);
                 
                 // Base ground - will be updated per area
-                const groundGeo = new THREE.PlaneGeometry(100, 100);
+                const groundGeo = new THREE.PlaneGeometry(80, 80);
                 const groundMat = new THREE.MeshLambertMaterial({ color: 0x7ba05b });
                 this.ground = new THREE.Mesh(groundGeo, groundMat);
                 this.ground.rotation.x = -Math.PI / 2;
@@ -2101,8 +2101,8 @@
                     const nextAngle = ((i + 1) / 30) * Math.PI * 2;
                     
                     // Vary distance for organic feel
-                    const distance = 36 + Math.sin(i * 0.5) * 5 + (r() - 0.5) * 2;
-                    const nextDistance = 36 + Math.sin((i + 1) * 0.5) * 5 + (r() - 0.5) * 2;
+                    const distance = 30 + Math.sin(i * 0.5) * 4 + (r() - 0.5) * 1.5;
+                    const nextDistance = 30 + Math.sin((i + 1) * 0.5) * 4 + (r() - 0.5) * 1.5;
                     
                     const x = Math.cos(angle) * distance;
                     const z = Math.sin(angle) * distance;
@@ -2176,9 +2176,9 @@
                 for (let i = 0; i < 60; i++) {
                     const stalactite = new THREE.Mesh(stalactiteGeo, stalactiteMat);
                     stalactite.position.set(
-                        (r() - 0.5) * 80,
+                        (r() - 0.5) * 60,
                         9 + r() * 2,
-                        (r() - 0.5) * 80
+                        (r() - 0.5) * 60
                     );
                     stalactite.rotation.x = Math.PI;
                     stalactite.scale.set(1, 0.8 + r() * 0.6, 1);
@@ -2192,9 +2192,9 @@
                 for (let i = 0; i < 50; i++) {
                     const stalagmite = new THREE.Mesh(stalagmiteGeo, stalagmiteMat);
                     stalagmite.position.set(
-                        (r() - 0.5) * 80,
+                        (r() - 0.5) * 60,
                         1.25,
-                        (r() - 0.5) * 80
+                        (r() - 0.5) * 60
                     );
                     stalagmite.scale.set(1, 0.7 + r() * 0.8, 1);
                     stalagmite.castShadow = true;
@@ -2204,8 +2204,8 @@
                 
                 // 15 Column formations spread across ENTIRE mine floor
                 for (let i = 0; i < 15; i++) {
-                    const x = (r() - 0.5) * 70;
-                    const z = (r() - 0.5) * 70;
+                    const x = (r() - 0.5) * 55;
+                    const z = (r() - 0.5) * 55;
                     const column = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.4, 0.45, 10, 8),
                         new THREE.MeshLambertMaterial({ color: 0x6a6a6a })
@@ -2218,8 +2218,8 @@
                 
                 // 20 Mine carts spread randomly across ENTIRE mine
                 for (let i = 0; i < 20; i++) {
-                    const cartX = (r() - 0.5) * 70;
-                    const cartZ = (r() - 0.5) * 70;
+                    const cartX = (r() - 0.5) * 55;
+                    const cartZ = (r() - 0.5) * 55;
                     const cartBody = new THREE.Mesh(
                         new THREE.BoxGeometry(1.2, 0.6, 0.8),
                         new THREE.MeshLambertMaterial({ color: 0x8b4513 })
@@ -2241,8 +2241,8 @@
                 
                 // 35 Pickaxes scattered across ENTIRE mine
                 for (let i = 0; i < 35; i++) {
-                    const px = (r() - 0.5) * 70;
-                    const pz = (r() - 0.5) * 70;
+                    const px = (r() - 0.5) * 55;
+                    const pz = (r() - 0.5) * 55;
                     const handle = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.05, 0.05, 1.2, 8),
                         new THREE.MeshLambertMaterial({ color: 0x8b4513 })
@@ -2263,8 +2263,8 @@
                 
                 // 40 Glowing lanterns scattered throughout mine
                 for (let i = 0; i < 40; i++) {
-                    const x = (r() - 0.5) * 70;
-                    const z = (r() - 0.5) * 70;
+                    const x = (r() - 0.5) * 55;
+                    const z = (r() - 0.5) * 55;
                     const lantern = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.2, 0.3, 0.6, 8),
                         new THREE.MeshLambertMaterial({ 
@@ -2287,8 +2287,8 @@
                 const boulderGeo = new THREE.SphereGeometry(0.8, 8, 8);
                 const boulderMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
                 for (let i = 0; i < 50; i++) {
-                    const x = (r() - 0.5) * 70;
-                    const z = (r() - 0.5) * 70;
+                    const x = (r() - 0.5) * 55;
+                    const z = (r() - 0.5) * 55;
                     for (let j = 0; j < 2; j++) {
                         const boulder = new THREE.Mesh(boulderGeo, boulderMat);
                         boulder.position.set(x + (r() - 0.5) * 2, 0.4 + j * 0.6, z + (r() - 0.5) * 2);
@@ -2304,8 +2304,8 @@
                     // Random position with minimum distance from other rocks
                     let x, z, tooClose;
                     do {
-                        x = (r() - 0.5) * 65; // -32.5 to 32.5 (much wider spread)
-                        z = (r() - 0.5) * 65; // -32.5 to 32.5
+                        x = (r() - 0.5) * 50; // -25 to 25 (tighter spread)
+                        z = (r() - 0.5) * 50; // -25 to 25
                         
                         // Check distance from existing rocks
                         tooClose = false;
