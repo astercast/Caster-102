@@ -4274,7 +4274,7 @@ function mergeChiaNFTs(cols1, cols2) {
 }
 
 
-function forceChiaRefresh() {
+async function forceChiaRefresh() {
     // Clear the unified Chia cache then reload treasury
     try {
         localStorage.removeItem('awiz_chia_treasury_v3');
@@ -4286,10 +4286,11 @@ function forceChiaRefresh() {
         localStorage.removeItem('awizard_cat_prices_v1'); // also clear emoji market price cache
     } catch {}
     _treasuryLastLoad = 0; // reset cooldown so it can reload immediately
-    loadComprehensiveTreasury();
+    return loadComprehensiveTreasury(true);
 }
 
 let _treasuryLastLoad = 0;
+let isRefreshingChiaTreasury = false;
 async function loadComprehensiveTreasury(force = false) {
     const now = Date.now();
     if (!force && now - _treasuryLastLoad < 600000) {
@@ -4427,6 +4428,12 @@ async function loadComprehensiveTreasury(force = false) {
                             // Determine if we should refresh in background
                             shouldRefresh = cacheAge > CACHE_TTL;
                             
+                            const hasNonXchAssets = cached.some(w => (w.tokens?.length || 0) > 0 || (w.nfts?.length || 0) > 0);
+                            if (!hasNonXchAssets) {
+                                console.warn('⚠️ Snapshot has no CATs/NFTs, refreshing from Spacescan');
+                                shouldRefresh = true;
+                            }
+
                             if (!shouldRefresh) {
                                 console.log('✅ Snapshot is fresh (<3h), using it');
                                 return cached;
@@ -5272,8 +5279,16 @@ document.addEventListener('DOMContentLoaded', () => {
             isRefreshingChiaTreasury = true;
             
             try {
+                const chiaList = document.getElementById('chia-holdings-list');
+                if (chiaList) {
+                    chiaList.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.4);font-size:12px;">
+                        <div style="font-size:24px;margin-bottom:8px;">⏳</div>
+                        <div>Refreshing Chia treasury…</div>
+                        <div style="font-size:11px;margin-top:8px;opacity:0.5;">Bypassing cache and reloading from Spacescan</div>
+                    </div>`;
+                }
                 // Force a full treasury refresh (bypass cache + cooldown)
-                await loadComprehensiveTreasury(true);
+                await forceChiaRefresh();
                 alert('✅ Treasury refreshed from Spacescan!');
             } catch(e) {
                 console.error('Refresh error:', e);
