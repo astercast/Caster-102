@@ -16,10 +16,19 @@
             font-family: 'Nunito', sans-serif; background: linear-gradient(180deg, var(--blue-sky) 0%, var(--green-light) 100%);
             color: var(--brown-dark); overflow: hidden; height: 100vh; touch-action: none;
             transition: background 1.5s ease; /* Smooth day/night transition */
-            transform: scale(0.8); transform-origin: top left; width: 125%; height: 125%;
+            width: 100%; height: 100%;
         }
         body.night-mode {
             background: linear-gradient(180deg, #1a1a3e 0%, #0f1a2e 100%);
+        }
+
+        @media (max-width: 768px), (orientation: portrait) {
+            body {
+                transform: scale(0.8);
+                transform-origin: top left;
+                width: 125%;
+                height: 125%;
+            }
         }
         #game-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; max-width: 1600px; max-height: 900px; }
         #hud {
