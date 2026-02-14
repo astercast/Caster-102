@@ -1296,6 +1296,7 @@
                 this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 this.renderer.setClearColor(0x000000, 0); // Transparent clear color
                 
                 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -1304,6 +1305,8 @@
                 const sunLight = new THREE.DirectionalLight(0xffd700, 0.8);
                 sunLight.position.set(10, 20, 10);
                 sunLight.castShadow = true;
+                sunLight.shadow.bias = -0.0006;
+                sunLight.shadow.normalBias = 0.02;
                 this.scene.add(sunLight);
                 
                 // Base ground - will be updated per area
@@ -1561,7 +1564,8 @@
                         new THREE.MeshLambertMaterial({ 
                             color: [0x6d9450, 0x7ba05b, 0x8fb570][Math.floor(r() * 3)],
                             transparent: true,
-                            opacity: 0.4
+                            opacity: 0.4,
+                            depthWrite: false
                         })
                     );
                     grassPatch.position.set(
@@ -2839,7 +2843,8 @@
                         new THREE.MeshLambertMaterial({ 
                             color: [0xedd9a8, 0xf4a460, 0xdeb887][Math.floor(r() * 3)],
                             transparent: true,
-                            opacity: 0.6
+                            opacity: 0.6,
+                            depthWrite: false
                         })
                     );
                     sandPatch.position.set(x, 0.085 + i * 0.00005, z);
@@ -2859,7 +2864,7 @@
                         const z = Math.sin(baseAngle) * distance + (r() - 0.5) * width;
                         const patch = new THREE.Mesh(
                             new THREE.CircleGeometry(1 + r() * 0.8, 8),
-                            new THREE.MeshLambertMaterial({ color: 0xf4a460, transparent: true, opacity: 0.7 })
+                            new THREE.MeshLambertMaterial({ color: 0xf4a460, transparent: true, opacity: 0.7, depthWrite: false })
                         );
                         patch.position.set(x, 0.09, z);
                         patch.rotation.x = -Math.PI / 2;
@@ -2918,6 +2923,63 @@
                     coconut.position.set(x, 0.3, z);
                     this.scene.add(coconut);
                     this.areaObjects.push(coconut);
+                }
+
+                // Extra beach clutter: shells
+                const shellColors = [0xfff1d0, 0xf4e1b6, 0xffd6a0];
+                for (let i = 0; i < 18; i++) {
+                    const angle = r() * Math.PI * 2;
+                    const distance = 16 + r() * 18;
+                    const x = Math.cos(angle) * distance + (r() - 0.5) * 1.2;
+                    const z = Math.sin(angle) * distance + (r() - 0.5) * 1.2;
+                    const shell = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.18 + r() * 0.12, 8, 8),
+                        new THREE.MeshLambertMaterial({ color: shellColors[Math.floor(r() * shellColors.length)] })
+                    );
+                    shell.scale.set(1, 0.6, 1.1);
+                    shell.position.set(x, 0.12, z);
+                    shell.rotation.y = r() * Math.PI;
+                    this.scene.add(shell);
+                    this.areaObjects.push(shell);
+                }
+
+                // Extra beach clutter: starfish
+                const starMat = new THREE.MeshLambertMaterial({ color: 0xff8c42, emissive: 0xd97706, emissiveIntensity: 0.2 });
+                for (let i = 0; i < 10; i++) {
+                    const angle = r() * Math.PI * 2;
+                    const distance = 17 + r() * 16;
+                    const x = Math.cos(angle) * distance + (r() - 0.5) * 1.0;
+                    const z = Math.sin(angle) * distance + (r() - 0.5) * 1.0;
+                    const starGroup = new THREE.Group();
+                    for (let j = 0; j < 5; j++) {
+                        const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.1, 0.6, 5), starMat);
+                        const armAngle = (j / 5) * Math.PI * 2;
+                        arm.position.set(Math.cos(armAngle) * 0.25, 0.02, Math.sin(armAngle) * 0.25);
+                        arm.rotation.z = Math.PI / 2;
+                        arm.rotation.y = armAngle;
+                        starGroup.add(arm);
+                    }
+                    starGroup.position.set(x, 0.12, z);
+                    starGroup.rotation.y = r() * Math.PI;
+                    this.scene.add(starGroup);
+                    this.areaObjects.push(starGroup);
+                }
+
+                // Extra beach clutter: driftwood
+                for (let i = 0; i < 8; i++) {
+                    const angle = r() * Math.PI * 2;
+                    const distance = 15 + r() * 12;
+                    const x = Math.cos(angle) * distance;
+                    const z = Math.sin(angle) * distance;
+                    const driftwood = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.12, 0.18, 1.4 + r() * 1.4, 8),
+                        new THREE.MeshLambertMaterial({ color: 0x7a4a2a })
+                    );
+                    driftwood.position.set(x, 0.16, z);
+                    driftwood.rotation.z = Math.PI / 2;
+                    driftwood.rotation.y = r() * Math.PI;
+                    this.scene.add(driftwood);
+                    this.areaObjects.push(driftwood);
                 }
                 
                 // Minimal beach rocks
@@ -3151,7 +3213,8 @@
                         new THREE.MeshBasicMaterial({ 
                             color: dustColors[Math.floor(r() * dustColors.length)],
                             transparent: true,
-                            opacity: 0.15
+                            opacity: 0.15,
+                            depthWrite: false
                         })
                     );
                     dust.position.set(
@@ -3172,7 +3235,8 @@
                         new THREE.MeshBasicMaterial({ 
                             color: 0xffffff,
                             transparent: true,
-                            opacity: 0.6
+                            opacity: 0.6,
+                            depthWrite: false
                         })
                     );
                     stardust.position.set(
@@ -3404,7 +3468,10 @@
                 if (this.wizard) {
                     Object.values(this.wizard).forEach(part => { if (part && part.parent) this.scene.remove(part); });
                 }
-                const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 1.4, 8), new THREE.MeshLambertMaterial({ color: 0xf97316 }));
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.5, 0.6, 1.4, 8),
+                    new THREE.MeshLambertMaterial({ color: 0x2563eb })
+                );
                 body.position.set(-6, 0.7, 0);
                 body.castShadow = true;
                 this.scene.add(body);
@@ -3417,7 +3484,10 @@
                 const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffeb3b }));
                 rightEye.position.set(-6.15, 1.52, 0.32);
                 this.scene.add(rightEye);
-                const hat = new THREE.Mesh(new THREE.ConeGeometry(0.4, 1.2, 16), new THREE.MeshLambertMaterial({ color: 0xf97316 }));
+                const hat = new THREE.Mesh(
+                    new THREE.ConeGeometry(0.4, 1.2, 16),
+                    new THREE.MeshLambertMaterial({ color: 0x2563eb })
+                );
                 hat.position.set(-6, 2.4, 0);
                 hat.castShadow = true;
                 this.scene.add(hat);
@@ -3640,6 +3710,10 @@
                 }
                 
                 plantGroup.userData = { tier, swayPhase: Math.random() * Math.PI * 2 };
+                plantGroup.frustumCulled = false;
+                plantGroup.traverse(child => {
+                    child.frustumCulled = false;
+                });
                 
                 if (tier === 1) {
                     // Tier 1: Blooming flower with colorful petals
@@ -4891,30 +4965,51 @@
                         if (maturePlots.length > 0) {
                             const targetPlot = maturePlots[Math.floor(Math.random() * maturePlots.length)];
                             
-                            // Spawn rat thief
-                            const rat = new THREE.Mesh(
-                                new THREE.SphereGeometry(0.5, 10, 10),
-                                new THREE.MeshLambertMaterial({ color: 0x5a5a5a, emissive: 0xff4444, emissiveIntensity: 0.7 })
+                            // Spawn rat thief (body + head + ears + tail)
+                            const ratGroup = new THREE.Group();
+                            const ratBody = new THREE.Mesh(
+                                new THREE.SphereGeometry(0.36, 12, 12),
+                                new THREE.MeshLambertMaterial({ color: 0x5a5a5a, emissive: 0x331111, emissiveIntensity: 0.3 })
                             );
-                            rat.position.set(targetPlot.x + 5, 0.45, targetPlot.z);
-                            this.scene.add(rat);
-                            this.areaObjects.push(rat);
-                            
-                            // Add whiskers/ears
-                            const ear1 = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshLambertMaterial({ color: 0xff69b4 }));
-                            ear1.position.set(targetPlot.x + 5 - 0.22, 0.7, targetPlot.z + 0.1);
-                            this.scene.add(ear1);
-                            this.areaObjects.push(ear1);
-                            
-                            const ear2 = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), new THREE.MeshLambertMaterial({ color: 0xff69b4 }));
-                            ear2.position.set(targetPlot.x + 5 + 0.22, 0.7, targetPlot.z + 0.1);
-                            this.scene.add(ear2);
-                            this.areaObjects.push(ear2);
+                            const ratHead = new THREE.Mesh(
+                                new THREE.SphereGeometry(0.22, 12, 12),
+                                new THREE.MeshLambertMaterial({ color: 0x666666 })
+                            );
+                            ratHead.position.set(0, 0.08, 0.32);
+                            ratBody.position.set(0, 0.02, 0);
+                            ratGroup.add(ratBody);
+                            ratGroup.add(ratHead);
+
+                            const ear1 = new THREE.Mesh(
+                                new THREE.SphereGeometry(0.12, 8, 8),
+                                new THREE.MeshLambertMaterial({ color: 0xff69b4 })
+                            );
+                            ear1.position.set(-0.14, 0.23, 0.35);
+                            const ear2 = new THREE.Mesh(
+                                new THREE.SphereGeometry(0.12, 8, 8),
+                                new THREE.MeshLambertMaterial({ color: 0xff69b4 })
+                            );
+                            ear2.position.set(0.14, 0.23, 0.35);
+                            ratGroup.add(ear1);
+                            ratGroup.add(ear2);
+
+                            const tail = new THREE.Mesh(
+                                new THREE.CylinderGeometry(0.03, 0.05, 0.6, 8),
+                                new THREE.MeshLambertMaterial({ color: 0x8b6b6b })
+                            );
+                            tail.position.set(0, 0.05, -0.45);
+                            tail.rotation.x = Math.PI / 2.4;
+                            ratGroup.add(tail);
+
+                            ratGroup.position.set(targetPlot.x + 5, 0.45, targetPlot.z);
+                            this.scene.add(ratGroup);
+                            this.areaObjects.push(ratGroup);
                             
                             this.ratThieves.push({
-                                mesh: rat,
+                                mesh: ratGroup,
                                 ear1: ear1,
                                 ear2: ear2,
+                                tail: tail,
                                 x: targetPlot.x + 5,
                                 z: targetPlot.z,
                                 targetPlot: targetPlot,
@@ -4931,8 +5026,6 @@
                             const dx = rat.targetPlot.x - rat.x;
                             rat.x += dx * 0.12; // Faster approach
                             rat.mesh.position.x = rat.x;
-                            rat.ear1.position.x = rat.x - 0.2;
-                            rat.ear2.position.x = rat.x + 0.2;
                             
                             if (Math.abs(dx) < 0.5) {
                                 rat.state = 'stealing';
@@ -4960,19 +5053,11 @@
                         } else if (rat.state === 'running_away') {
                             rat.x += 0.25; // Run away even faster
                             rat.mesh.position.x = rat.x;
-                            rat.ear1.position.x = rat.x - 0.2;
-                            rat.ear2.position.x = rat.x + 0.2;
                             
                             if (rat.x > 20) { // Escaped off screen
                                 this.scene.remove(rat.mesh);
-                                this.scene.remove(rat.ear1);
-                                this.scene.remove(rat.ear2);
                                 const idx1 = this.areaObjects.indexOf(rat.mesh);
                                 if (idx1 > -1) this.areaObjects.splice(idx1, 1);
-                                const idx2 = this.areaObjects.indexOf(rat.ear1);
-                                if (idx2 > -1) this.areaObjects.splice(idx2, 1);
-                                const idx3 = this.areaObjects.indexOf(rat.ear2);
-                                if (idx3 > -1) this.areaObjects.splice(idx3, 1);
                                 this.ratThieves.splice(i, 1);
                             }
                         }
