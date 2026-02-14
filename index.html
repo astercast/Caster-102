@@ -1018,6 +1018,71 @@
                 letter-spacing: -0.01em !important;
             }
 
+            /* ── Page Flip Animations for Swipe Navigation ── */
+            @keyframes flipInLeft {
+                from {
+                    transform: perspective(1200px) rotateY(-90deg);
+                    opacity: 0;
+                }
+                to {
+                    transform: perspective(1200px) rotateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes flipInRight {
+                from {
+                    transform: perspective(1200px) rotateY(90deg);
+                    opacity: 0;
+                }
+                to {
+                    transform: perspective(1200px) rotateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes flipOutLeft {
+                from {
+                    transform: perspective(1200px) rotateY(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: perspective(1200px) rotateY(90deg);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes flipOutRight {
+                from {
+                    transform: perspective(1200px) rotateY(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: perspective(1200px) rotateY(-90deg);
+                    opacity: 0;
+                }
+            }
+
+            .content {
+                transform-style: preserve-3d !important;
+            }
+
+            .content.flip-in-left {
+                animation: flipInLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            }
+
+            .content.flip-in-right {
+                animation: flipInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            }
+
+            .content.flip-out-left {
+                animation: flipOutLeft 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards !important;
+            }
+
+            .content.flip-out-right {
+                animation: flipOutRight 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards !important;
+            }
+
             /* ── Base Layout ── */
             .container {
                 padding: 10px !important;
@@ -2910,12 +2975,58 @@
             // REMOVED - no modal
         }
         
+        // Tab order for swipe navigation
+        const tabOrder = ['market', 'portfolio', 'treasury', 'howto', 'book', 'valley'];
+        
         // Tab switching function
-        function showTab(tabName) {
-            document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
-            document.querySelectorAll(".content").forEach(content => content.classList.remove("active"));
-            event.target.classList.add("active");
-            document.getElementById(tabName).classList.add("active");
+        function showTab(tabName, direction = null) {
+            const isMobile = window.innerWidth <= 768;
+            const currentActive = document.querySelector(".content.active");
+            const newContent = document.getElementById(tabName);
+            
+            // Remove animation classes from all content
+            document.querySelectorAll(".content").forEach(content => {
+                content.classList.remove("flip-in-left", "flip-in-right", "flip-out-left", "flip-out-right");
+            });
+            
+            // Mobile flip animation
+            if (isMobile && currentActive && direction && currentActive !== newContent) {
+                // Animate out current content
+                if (direction === 'left') {
+                    currentActive.classList.add('flip-out-right');
+                } else if (direction === 'right') {
+                    currentActive.classList.add('flip-out-left');
+                }
+                
+                // Wait for out animation, then switch
+                setTimeout(() => {
+                    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+                    document.querySelectorAll(".content").forEach(content => content.classList.remove("active"));
+                    
+                    // Find and activate the correct tab button
+                    const tabButtons = document.querySelectorAll(".tab");
+                    tabButtons.forEach(tab => {
+                        if (tab.getAttribute('onclick')?.includes(tabName)) {
+                            tab.classList.add("active");
+                        }
+                    });
+                    
+                    // Show new content with flip-in animation
+                    newContent.classList.add("active");
+                    if (direction === 'left') {
+                        newContent.classList.add('flip-in-left');
+                    } else if (direction === 'right') {
+                        newContent.classList.add('flip-in-right');
+                    }
+                }, 300);
+            } else {
+                // No animation - instant switch
+                document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+                document.querySelectorAll(".content").forEach(content => content.classList.remove("active"));
+                if (event && event.target) event.target.classList.add("active");
+                newContent.classList.add("active");
+            }
+            
             // Update URL hash so refresh restores the same page
             window.location.hash = tabName;
             if (tabName === "treasury") {
@@ -6912,6 +7023,88 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         miniplayer.style.display = 'flex';
                     }
+                }
+            });
+        })();
+
+        // ══════════════════════════════════════════════════════════════════════════
+        // MOBILE SWIPE NAVIGATION
+        // ══════════════════════════════════════════════════════════════════════════
+        (function initSwipeNavigation() {
+            if (window.innerWidth > 768) return; // Desktop only uses clicks
+
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchEndX = 0;
+            let touchEndY = 0;
+            const minSwipeDistance = 50; // minimum distance for swipe in pixels
+
+            const container = document.querySelector('.container');
+            if (!container) return;
+
+            container.addEventListener('touchstart', (e) => {
+                // Don't interfere with swipes on the WTV drawer or overlay
+                if (e.target.closest('#video-miniplayer') || e.target.closest('#wtv-drawer-overlay')) return;
+                
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            container.addEventListener('touchend', (e) => {
+                // Don't interfere with swipes on the WTV drawer or overlay
+                if (e.target.closest('#video-miniplayer') || e.target.closest('#wtv-drawer-overlay')) return;
+                
+                touchEndX = e.changedTouches[0].screenX;
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                // Only trigger swipe if horizontal movement is greater than vertical
+                if (Math.abs(deltaX) < Math.abs(deltaY)) return;
+                if (Math.abs(deltaX) < minSwipeDistance) return;
+
+                // Get current active tab
+                const currentContent = document.querySelector('.content.active');
+                if (!currentContent) return;
+                
+                const currentTabName = currentContent.id;
+                const currentIndex = tabOrder.indexOf(currentTabName);
+                if (currentIndex === -1) return;
+
+                let newIndex = currentIndex;
+                let direction = null;
+
+                if (deltaX > 0) {
+                    // Swipe right -> go to previous tab
+                    if (currentIndex > 0) {
+                        newIndex = currentIndex - 1;
+                        direction = 'right';
+                    }
+                } else {
+                    // Swipe left -> go to next tab
+                    if (currentIndex < tabOrder.length - 1) {
+                        newIndex = currentIndex + 1;
+                        direction = 'left';
+                    }
+                }
+
+                if (newIndex !== currentIndex && direction) {
+                    const newTabName = tabOrder[newIndex];
+                    showTab(newTabName, direction);
+                }
+            }
+
+            // Re-initialize on orientation change or resize from desktop to mobile
+            window.addEventListener('resize', () => {
+                if (window.innerWidth <= 768) {
+                    // Already initialized, do nothing
+                } else {
+                    // Switched to desktop, remove listeners if needed
+                    // (not removing for simplicity since condition checks width)
                 }
             });
         })();
