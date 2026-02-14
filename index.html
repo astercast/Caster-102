@@ -5836,10 +5836,11 @@ document.addEventListener('DOMContentLoaded', () => {
             window._wtvMiniplayer = miniplayer;
 
             const wasHidden = localStorage.getItem('videoMiniplayerHidden') === 'true';
+            window._wtvHiddenAtLoad = wasHidden;
             if (wasHidden) {
                 hideMiniplayer();
             } else {
-                setRestoreVisible(false);
+                showMiniplayer();
             }
 
             // Load first video
@@ -5899,6 +5900,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const miniplayer = window._wtvMiniplayer || document.getElementById('video-miniplayer');
             
             if (restoreBtn && miniplayer) {
+                const hiddenAtLoad = window._wtvHiddenAtLoad || localStorage.getItem('videoMiniplayerHidden') === 'true';
+                if (hiddenAtLoad) {
+                    restoreBtn.style.display = 'flex';
+                    miniplayer.classList.add('hidden');
+                    miniplayer.style.display = 'none';
+                }
                 restoreBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     e.preventDefault();
