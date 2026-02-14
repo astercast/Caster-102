@@ -5592,6 +5592,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let isIframePaused = false;
 
+            const setRestoreVisible = (visible) => {
+                const restoreBtn = document.getElementById('wtv-restore-btn');
+                if (restoreBtn) {
+                    restoreBtn.style.display = visible ? 'flex' : 'none';
+                }
+            };
+
+            const hideMiniplayer = () => {
+                miniplayer.classList.add('hidden');
+                localStorage.setItem('videoMiniplayerHidden', 'true');
+                setRestoreVisible(true);
+            };
+
+            const showMiniplayer = () => {
+                miniplayer.classList.remove('hidden');
+                localStorage.removeItem('videoMiniplayerHidden');
+                setRestoreVisible(false);
+            };
+
+            window._showWtvMiniplayer = showMiniplayer;
+            window._hideWtvMiniplayer = hideMiniplayer;
+
             // Load Google Drive video
             function loadVideo(index) {
                 if (index >= 0 && index < googleDriveVideos.length) {
@@ -5678,14 +5700,8 @@ document.addEventListener('DOMContentLoaded', () => {
             closeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 console.log('🔴 Closing WTV miniplayer...');
-                miniplayer.classList.add('hidden');
-                localStorage.setItem('videoMiniplayerHidden', 'true');
-                window._wtvShouldShowRestoreBtn = true;
-                const restoreBtn = document.getElementById('wtv-restore-btn');
-                if (restoreBtn) {
-                    restoreBtn.style.display = 'flex';
-                    console.log('✅ WTV restore button shown');
-                }
+                hideMiniplayer();
+                console.log('✅ WTV restore button shown');
             });
 
             // WTV is OPEN by default - only hide if explicitly closed before
@@ -5815,9 +5831,10 @@ document.addEventListener('DOMContentLoaded', () => {
             window._wtvMiniplayer = miniplayer;
 
             const wasHidden = localStorage.getItem('videoMiniplayerHidden') === 'true';
-            window._wtvShouldShowRestoreBtn = wasHidden;
             if (wasHidden) {
-                miniplayer.classList.add('hidden');
+                hideMiniplayer();
+            } else {
+                setRestoreVisible(false);
             }
 
             // Load first video
@@ -5853,6 +5870,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gap: 4px;
         animation: wtv-pulse 2s infinite;
     " onmouseover="this.style.background='linear-gradient(135deg, rgba(251,191,36,1), rgba(220,38,38,0.6))'; this.style.transform='scale(1.15)'; this.style.boxShadow='0 0 35px rgba(251,191,36,0.85), inset 0 0 20px rgba(251,191,36,0.4)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(251,191,36,0.8), rgba(220,38,38,0.4))'; this.style.transform=''; this.style.boxShadow='0 0 25px rgba(251,191,36,0.6), inset 0 0 15px rgba(251,191,36,0.2)';"
+        onclick="if (window._showWtvMiniplayer) window._showWtvMiniplayer();"
         title="Click to restore WTV miniplayer">
         <span style="font-size: 28px;">🎬</span>
         <span style="font-size: 10px; opacity: 0.9;">WTV</span>
@@ -5876,18 +5894,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const miniplayer = window._wtvMiniplayer || document.getElementById('video-miniplayer');
             
             if (restoreBtn && miniplayer) {
-                if (window._wtvShouldShowRestoreBtn) {
-                    restoreBtn.style.display = 'flex';
-                    miniplayer.classList.add('hidden');
-                }
                 restoreBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     e.preventDefault();
                     console.log('🎬 Restoring WTV miniplayer...');
-                    miniplayer.classList.remove('hidden');
-                    localStorage.removeItem('videoMiniplayerHidden');
-                    window._wtvShouldShowRestoreBtn = false;
-                    restoreBtn.style.display = 'none';
+                    if (window._showWtvMiniplayer) {
+                        window._showWtvMiniplayer();
+                    } else {
+                        miniplayer.classList.remove('hidden');
+                        localStorage.removeItem('videoMiniplayerHidden');
+                        restoreBtn.style.display = 'none';
+                    }
                     console.log('✅ WTV miniplayer restored successfully');
                 });
                 console.log('✅ WTV restore button listener attached');
