@@ -2121,8 +2121,12 @@
                     window._chiaXchPrice = _treasuryCache.chiaData?.xchPrice || 4;
                     updateNFTGallery(_treasuryCache.nftData);
                 }
-                // Load fresh treasury in background
-                setTimeout(loadComprehensiveTreasury, 100);
+                // Load fresh treasury in background - check if function exists
+                if (typeof loadComprehensiveTreasury !== 'undefined') {
+                    setTimeout(loadComprehensiveTreasury, 100);
+                } else {
+                    console.warn('⚠️ loadComprehensiveTreasury not yet defined');
+                }
             }
             if (tabName === "valley") {
                 const frame = document.getElementById('caster-valley-frame');
@@ -5761,12 +5765,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Check if miniplayer was previously closed
-            if (localStorage.getItem('videoMiniplayerHidden') === 'true') {
-                miniplayer.classList.add('hidden');
-                const restoreBtn = document.getElementById('wtv-restore-btn');
-                restoreBtn.style.display = 'flex';
-            }
+            // WTV is OPEN by default - only hide if explicitly closed before
+            // Remove the check completely so WTV always starts open
+            // User can close it if they want, but default state is VISIBLE
 
             // Make miniplayer draggable & resizable
             let isDragging = false;
