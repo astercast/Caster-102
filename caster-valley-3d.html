@@ -2487,15 +2487,24 @@
                     this.areaObjects.push(leaf);
                 }
                 
-                // 60 Large pine trees scattered across FULL map with clearings + outer bias
+                // 52 Large pine trees scattered across FULL map with clearings + stronger edge bias
                 const treePositions = []; // Store tree positions for collision detection
-                for (let i = 0; i < 60; i++) {
-                    // Random position avoiding center area and clearings
-                    const useOuter = r() < 0.65;
-                    const pos = useOuter ? pickForestPos(18, 30) : pickForestPos(10, 26);
-                    const x = pos.x;
-                    const z = pos.z;
-                    if (isInClearing(x, z, 1.2)) continue;
+                const minTreeSpacing = 5.5;
+                for (let i = 0; i < 52; i++) {
+                    let x, z;
+                    let tries = 0;
+                    let tooClose = false;
+                    do {
+                        // Random position avoiding center area and clearings
+                        const useOuter = r() < 0.8;
+                        const pos = useOuter ? pickForestPos(22, 30) : pickForestPos(12, 24);
+                        x = pos.x;
+                        z = pos.z;
+                        tooClose = treePositions.some(p => Math.hypot(x - p.x, z - p.z) < minTreeSpacing);
+                        tries += 1;
+                    } while ((isInClearing(x, z, 1.6) || tooClose) && tries < 40);
+
+                    if (isInClearing(x, z, 1.6) || tooClose) continue;
                     
                     treePositions.push({ x, z }); // Store position
                     
